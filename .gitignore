@@ -47,3 +47,13 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Ignore Rstudio project files
+*.Rproj
+
+# Ignore everything in renv
+renv/*
+
+# But don't ignore these files in renv
+!renv/activate.R
+!renv/settings.json

@@ -57,3 +57,4 @@ renv/*
 # But don't ignore these files in renv
 !renv/activate.R
 !renv/settings.json
+.Rproj.user

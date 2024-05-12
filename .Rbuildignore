@@ -2,3 +2,4 @@
 ^renv\.lock$
 ^rcausim\.Rproj$
 ^\.Rproj\.user$
+^vignettes/.*\.html$

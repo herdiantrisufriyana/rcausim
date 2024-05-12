@@ -58,3 +58,6 @@ renv/*
 !renv/activate.R
 !renv/settings.json
 .Rproj.user
+
+# Ignore OS system files
+.DS_Store

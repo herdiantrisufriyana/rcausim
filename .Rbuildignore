@@ -3,4 +3,4 @@
 ^rcausim\.Rproj$
 ^\.Rproj\.user$
 ^vignettes/.*\.html$
-^docs$
+^extras$

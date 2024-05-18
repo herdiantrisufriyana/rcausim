@@ -1,6 +1,7 @@
-## -----------------------------------------------------------------------------
+## ----echo=TRUE, results='hide', message=FALSE, warning=FALSE------------------
 library(rcausim)
 
+## -----------------------------------------------------------------------------
 # Load predefined edge data
 data(edges)
 print(edges)
@@ -27,9 +28,10 @@ function_A <- function(B){ ifelse(B>=95, 1, 0) }
 functions <- list(A = function_A, B = function_B)
 functions <- function_from_user(functions)
 
-## -----------------------------------------------------------------------------
+## ----echo=TRUE, results='hide', message=FALSE, warning=FALSE------------------
 library(igraph)
 
+## -----------------------------------------------------------------------------
 # Set up edges based on functions
 edges <- edge_from_function(functions)
 
@@ -43,5 +45,5 @@ data(functions)
 
 # Generate simulated data
 simulated_data <- data_from_function(functions, n = 100)
-print(simulated_data)
+head(simulated_data)
 

@@ -349,11 +349,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="defining-causal-structure" class="section level2">
 <h2>Defining Causal Structure</h2>
 <p>Start by defining the causal structure as a data frame of edges:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(rcausim)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co"># Load predefined edge data</span></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">data</span>(edges)</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">print</span>(edges)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(rcausim)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Load predefined edge data</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">data</span>(edges)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">print</span>(edges)</span></code></pre></div>
 <pre><code>##   from to
 ## 1    B  A
 ## 2    A  D
@@ -363,190 +362,67 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 6    A  E
 ## 7    C  E</code></pre>
 <p>Assist in setting up functions based on these edges:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Generate function setups from edge definitions</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>functions <span class="ot">&lt;-</span> <span class="fu">function_from_edge</span>(edges)</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">print</span>(functions)</span></code></pre></div>
-<pre><code>## $B
-## [1] &quot;n&quot;
-## 
-## $A
-## [1] &quot;B&quot;
-## 
-## $D
-## [1] &quot;A&quot;
-## 
-## $C
-## [1] &quot;A&quot; &quot;B&quot; &quot;D&quot;
-## 
-## $E
-## [1] &quot;A&quot; &quot;C&quot;
-## 
-## attr(,&quot;class&quot;)
-## [1] &quot;Functions&quot;</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Generate function setups from edge definitions</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>functions <span class="ot">&lt;-</span> <span class="fu">function_from_edge</span>(edges)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">print</span>(functions)</span></code></pre></div>
+<pre><code>## 0 / 5  vertices have functions.
+## Please define functions for:
+## B = function(n)
+## A = function(B)
+## D = function(A)
+## C = function(A,B,D)
+## E = function(A,C)</code></pre>
 <p>Define specific functions:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Define a function for vertex B</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>function_B <span class="ot">&lt;-</span> <span class="cf">function</span>(n){ <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">90</span>, <span class="at">sd =</span> <span class="dv">5</span>) }</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>functions <span class="ot">&lt;-</span> <span class="fu">define</span>(functions, <span class="st">&#39;B&#39;</span>, function_B)</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="fu">print</span>(functions)</span></code></pre></div>
-<pre><code>## $B
-## function(n){ rnorm(n, mean = 90, sd = 5) }
-## 
-## $A
-## [1] &quot;B&quot;
-## 
-## $D
-## [1] &quot;A&quot;
-## 
-## $C
-## [1] &quot;A&quot; &quot;B&quot; &quot;D&quot;
-## 
-## $E
-## [1] &quot;A&quot; &quot;C&quot;
-## 
-## attr(,&quot;class&quot;)
-## [1] &quot;Functions&quot;</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Define a function for vertex B</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>function_B <span class="ot">&lt;-</span> <span class="cf">function</span>(n){ <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">90</span>, <span class="at">sd =</span> <span class="dv">5</span>) }</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>functions <span class="ot">&lt;-</span> <span class="fu">define</span>(functions, <span class="st">&#39;B&#39;</span>, function_B)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="fu">print</span>(functions)</span></code></pre></div>
+<pre><code>## 1 / 5  vertices have functions.
+## Please define functions for:
+## A = function(B)
+## D = function(A)
+## C = function(A,B,D)
+## E = function(A,C)</code></pre>
 </div>
 <div id="alternatively-start-by-defining-functions" class="section level2">
 <h2>Alternatively, Start by Defining Functions</h2>
 <p>You can also start by defining functions directly:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Define a function for vertex B</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>function_B <span class="ot">&lt;-</span> <span class="cf">function</span>(n){ <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">90</span>, <span class="at">sd =</span> <span class="dv">5</span>) }</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co"># Define a function for vertex A</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>function_A <span class="ot">&lt;-</span> <span class="cf">function</span>(B){ <span class="fu">ifelse</span>(B<span class="sc">&gt;=</span><span class="dv">95</span>, <span class="dv">1</span>, <span class="dv">0</span>) }</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co"># Combine functions in a list</span></span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>functions <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">A =</span> function_A, <span class="at">B =</span> function_B)</span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>functions <span class="ot">&lt;-</span> <span class="fu">function_from_user</span>(functions)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Define a function for vertex B</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>function_B <span class="ot">&lt;-</span> <span class="cf">function</span>(n){ <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">90</span>, <span class="at">sd =</span> <span class="dv">5</span>) }</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co"># Define a function for vertex A</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>function_A <span class="ot">&lt;-</span> <span class="cf">function</span>(B){ <span class="fu">ifelse</span>(B<span class="sc">&gt;=</span><span class="dv">95</span>, <span class="dv">1</span>, <span class="dv">0</span>) }</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co"># Combine functions in a list</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>functions <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">A =</span> function_A, <span class="at">B =</span> function_B)</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>functions <span class="ot">&lt;-</span> <span class="fu">function_from_user</span>(functions)</span></code></pre></div>
 <p>Ensure the causal structure is a directed acyclic graph (DAG):</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">library</span>(igraph)</span></code></pre></div>
-<pre><code>## 
-## Attaching package: &#39;igraph&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     decompose, spectrum</code></pre>
-<pre><code>## The following object is masked from &#39;package:base&#39;:
-## 
-##     union</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Set up edges based on functions</span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>edges <span class="ot">&lt;-</span> <span class="fu">edge_from_function</span>(functions)</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co"># Check if the resulting edges form a DAG</span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph_from_data_frame</span>(edges, <span class="at">directed =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="fu">is_dag</span>(g)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">library</span>(igraph)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Set up edges based on functions</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>edges <span class="ot">&lt;-</span> <span class="fu">edge_from_function</span>(functions)</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co"># Check if the resulting edges form a DAG</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph_from_data_frame</span>(edges, <span class="at">directed =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="fu">is_dag</span>(g)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 </div>
 <div id="data-simulation" class="section level1">
 <h1>Data Simulation</h1>
 <p>Generate simulated data based on the predefined functions:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Assume completed functions setup</span></span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="fu">data</span>(functions)</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co"># Generate simulated data</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>simulated_data <span class="ot">&lt;-</span> <span class="fu">data_from_function</span>(functions, <span class="at">n =</span> <span class="dv">100</span>)</span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="fu">print</span>(simulated_data)</span></code></pre></div>
-<pre><code>##             B A   D         C E
-## 1   111.91087 1 0.3 0.8786631 1
-## 2    93.58955 0 0.0 0.0000000 0
-## 3    95.66212 0 0.0 0.0000000 0
-## 4    93.80484 0 0.0 0.0000000 0
-## 5    89.54003 0 0.0 0.0000000 0
-## 6    91.16682 0 0.0 0.0000000 0
-## 7    77.59190 0 0.0 0.0000000 0
-## 8    86.65143 0 0.0 0.0000000 0
-## 9    91.67109 0 0.0 0.0000000 0
-## 10   88.40118 0 0.0 0.0000000 0
-## 11   88.94963 0 0.0 0.0000000 0
-## 12   84.35200 0 0.0 0.0000000 0
-## 13  114.85218 1 0.3 0.9227827 1
-## 14   80.15362 0 0.0 0.0000000 0
-## 15   90.38115 0 0.0 0.0000000 0
-## 16   98.03753 0 0.0 0.0000000 0
-## 17   94.40409 0 0.0 0.0000000 0
-## 18   79.44464 0 0.0 0.0000000 0
-## 19   98.54409 0 0.0 0.0000000 0
-## 20   84.54810 0 0.0 0.0000000 0
-## 21   89.38863 0 0.0 0.0000000 0
-## 22   89.86280 0 0.0 0.0000000 0
-## 23   88.09999 0 0.0 0.0000000 0
-## 24   77.32196 0 0.0 0.0000000 0
-## 25   86.77129 0 0.0 0.0000000 0
-## 26   93.89330 0 0.0 0.0000000 0
-## 27  130.67316 1 0.3 1.0000000 1
-## 28   97.86279 0 0.0 0.0000000 0
-## 29   87.95518 0 0.0 0.0000000 0
-## 30   90.74661 0 0.0 0.0000000 0
-## 31   81.43370 0 0.0 0.0000000 0
-## 32   87.16015 0 0.0 0.0000000 0
-## 33   83.54554 0 0.0 0.0000000 0
-## 34   99.75163 0 0.0 0.0000000 0
-## 35   83.90882 0 0.0 0.0000000 0
-## 36   94.10175 0 0.0 0.0000000 0
-## 37   97.16745 0 0.0 0.0000000 0
-## 38   83.07176 0 0.0 0.0000000 0
-## 39   92.86590 0 0.0 0.0000000 0
-## 40   97.57737 0 0.0 0.0000000 0
-## 41   85.47481 0 0.0 0.0000000 0
-## 42   83.32403 0 0.0 0.0000000 0
-## 43   88.43722 0 0.0 0.0000000 0
-## 44   91.42800 0 0.0 0.0000000 0
-## 45   88.97059 0 0.0 0.0000000 0
-## 46   86.52266 0 0.0 0.0000000 0
-## 47  124.65864 1 0.3 1.0000000 1
-## 48  112.21481 1 0.3 0.8832221 1
-## 49   88.42768 0 0.0 0.0000000 0
-## 50   88.91005 0 0.0 0.0000000 0
-## 51   85.10843 0 0.0 0.0000000 0
-## 52   98.20006 0 0.0 0.0000000 0
-## 53   86.48676 0 0.0 0.0000000 0
-## 54  136.77626 1 0.3 1.0000000 1
-## 55   91.48093 0 0.0 0.0000000 0
-## 56   91.58972 0 0.0 0.0000000 0
-## 57   90.73794 0 0.0 0.0000000 0
-## 58   84.27256 0 0.0 0.0000000 0
-## 59   90.80684 0 0.0 0.0000000 0
-## 60   93.72990 0 0.0 0.0000000 0
-## 61   92.92369 0 0.0 0.0000000 0
-## 62   92.78005 0 0.0 0.0000000 0
-## 63   89.88776 0 0.0 0.0000000 0
-## 64   91.07825 0 0.0 0.0000000 0
-## 65   87.39892 0 0.0 0.0000000 0
-## 66  138.24860 1 0.3 1.0000000 1
-## 67   97.15590 0 0.0 0.0000000 0
-## 68   90.42593 0 0.0 0.0000000 0
-## 69   87.30656 0 0.0 0.0000000 0
-## 70   91.54468 0 0.0 0.0000000 0
-## 71   93.17124 0 0.0 0.0000000 0
-## 72   89.03418 0 0.0 0.0000000 0
-## 73   89.54564 0 0.0 0.0000000 0
-## 74   93.55071 0 0.0 0.0000000 0
-## 75   85.00028 0 0.0 0.0000000 0
-## 76   87.77077 0 0.0 0.0000000 0
-## 77   96.95888 0 0.0 0.0000000 0
-## 78   97.22175 0 0.0 0.0000000 0
-## 79   89.28935 0 0.0 0.0000000 0
-## 80   88.89018 0 0.0 0.0000000 0
-## 81   94.66149 0 0.0 0.0000000 0
-## 82   93.84123 0 0.0 0.0000000 0
-## 83   88.62188 0 0.0 0.0000000 0
-## 84   90.65017 0 0.0 0.0000000 0
-## 85   82.12359 0 0.0 0.0000000 0
-## 86   86.81599 0 0.0 0.0000000 0
-## 87  114.45868 1 0.3 0.9168801 1
-## 88   90.02416 0 0.0 0.0000000 0
-## 89   98.28517 0 0.0 0.0000000 0
-## 90   98.88936 0 0.0 0.0000000 0
-## 91   91.51730 0 0.0 0.0000000 0
-## 92   80.85489 0 0.0 0.0000000 0
-## 93   90.03217 0 0.0 0.0000000 0
-## 94   79.26865 0 0.0 0.0000000 0
-## 95   93.50706 0 0.0 0.0000000 0
-## 96  137.30744 1 0.3 1.0000000 1
-## 97   88.13041 0 0.0 0.0000000 0
-## 98   93.90637 0 0.0 0.0000000 0
-## 99   92.08301 0 0.0 0.0000000 0
-## 100  86.35727 0 0.0 0.0000000 0</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Assume completed functions setup</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">data</span>(functions)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co"># Generate simulated data</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>simulated_data <span class="ot">&lt;-</span> <span class="fu">data_from_function</span>(functions, <span class="at">n =</span> <span class="dv">100</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="fu">head</span>(simulated_data)</span></code></pre></div>
+<pre><code>##           B A   D C E
+## 1 135.39793 1 0.3 1 1
+## 2  91.96084 0 0.0 0 0
+## 3  87.63667 0 0.0 0 0
+## 4  87.71024 0 0.0 0 0
+## 5  93.72981 0 0.0 0 0
+## 6  92.92837 0 0.0 0 0</code></pre>
 </div>
 
 

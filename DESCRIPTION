@@ -1,21 +1,22 @@
 Package: rcausim
 Title: Generate Causally-Simulated Data
 Version: 0.0.0.9000
-Authors@R: 
-    person(
-      "Herdiantri"
-      ,"Sufriyana"
-      ,"herdi@tmu.edu.tw"
+Authors@R:
+  c(person(
+      given = "Herdiantri"
+      ,family = "Sufriyana"
+      ,email = "herdi@tmu.edu.tw"
       ,role = c("aut", "cre")
       ,comment = c(ORCID = "0000-0001-9178-0222")
     )
     ,person(
-      "Emily Chia-Yu"
-      ,"Su"
-      ,"emily@tmu.edu.tw"
+      given = "Emily Chia-Yu"
+      ,family = "Su"
+      ,email = "emily@tmu.edu.tw"
       ,role = c("aut")
       ,comment = c(ORCID = "0000-0003-4801-5159")
     )
+  )
 Description: Generate causally-simulated data to serve as ground truth for evaluating methods in causal discovery and effect estimation. The package provides tools to assist in defining functions based on specified edges, and conversely, defining edges based on functions. It enables the generation of data according to these predefined functions and causal structures. This is particularly useful for researchers in fields such as artificial intelligence, statistics, biology, medicine, epidemiology, economics, and social sciences, who are developing a general or a domain-specific methods to discover causal structures and estimate causal effects. Data simulation adheres to principles of structural causal modeling.
 License: GPL-3
 Encoding: UTF-8

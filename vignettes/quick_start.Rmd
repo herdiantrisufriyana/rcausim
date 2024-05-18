@@ -1,0 +1,91 @@
+---
+title: "Quick Start"
+author: "Herdiantri Sufriyana"
+date: "2024-05-11"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Quick Start}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+### Define Functions and Edges
+
+#### Defining Causal Structure
+
+Start by defining the causal structure as a data frame of edges:
+
+```{r}
+library(rcausim)
+
+# Load predefined edge data
+data(edges)
+print(edges)
+```
+
+Assist in setting up functions based on these edges:
+
+```{r}
+# Generate function setups from edge definitions
+functions <- function_from_edge(edges)
+print(functions)
+```
+
+Define specific functions:
+
+```{r}
+# Define a function for vertex B
+function_B <- function(n){ rnorm(n, mean = 90, sd = 5) }
+functions <- define(functions, 'B', function_B)
+print(functions)
+```
+
+#### Alternatively, Start by Defining Functions
+
+You can also start by defining functions directly:
+
+```{r}
+# Define a function for vertex B
+function_B <- function(n){ rnorm(n, mean = 90, sd = 5) }
+
+# Define a function for vertex A
+function_A <- function(B){ ifelse(B>=95, 1, 0) }
+
+# Combine functions in a list
+functions <- list(A = function_A, B = function_B)
+functions <- function_from_user(functions)
+```
+
+Ensure the causal structure is a directed acyclic graph (DAG):
+
+```{r}
+library(igraph)
+
+# Set up edges based on functions
+edges <- edge_from_function(functions)
+
+# Check if the resulting edges form a DAG
+g <- graph_from_data_frame(edges, directed = TRUE)
+is_dag(g)
+```
+
+### Data Simulation
+
+Generate simulated data based on the predefined functions:
+
+```{r}
+# Assume completed functions setup
+data(functions)
+
+# Generate simulated data
+simulated_data <- data_from_function(functions, n = 100)
+print(simulated_data)
+```
+
+
+
+
+
+
+
+

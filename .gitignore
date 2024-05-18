@@ -61,3 +61,7 @@ renv/*
 
 # Ignore OS system files
 .DS_Store
+
+# Ignore build outputs
+/doc/
+/Meta/

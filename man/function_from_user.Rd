@@ -13,7 +13,7 @@ of the list must be functions.}
 }
 \value{
 A list of functions. It can be an input for generating the simulated
-data, or redefined by a user using \code(define) function.
+data, or redefined by a user using \code{define} function.
 }
 \description{
 List functions from user

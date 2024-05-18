@@ -19,7 +19,7 @@ the specified arguments for the vertex in 'Functions'.}
 \value{
 A list of either functions or character vectors of arguments for
 function. It can be continuously defined or redefined by a user using
-\code(define) function. If all elements of the list are functions, then it
+\code{define} function. If all elements of the list are functions, then it
 can be an input for generating the simulated data.
 }
 \description{

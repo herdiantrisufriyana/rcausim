@@ -30,7 +30,9 @@ Start by defining the causal structure as a data frame of edges:
 
 ```r
 library(rcausim)
+```
 
+```r
 # Load predefined edge data
 data(edges)
 print(edges)
@@ -73,7 +75,9 @@ Ensure the causal structure is a directed acyclic graph (DAG):
 
 ```r
 library(igraph)
+```
 
+```r
 # Set up edges based on functions
 edges <- edge_from_function(functions)
 
@@ -92,7 +96,7 @@ data(functions)
 
 # Generate simulated data
 simulated_data <- data_from_function(functions, n = 100)
-print(simulated_data)
+head(simulated_data)
 ```
 
 

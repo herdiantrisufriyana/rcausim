@@ -8,6 +8,8 @@
 #'
 #' @keywords function
 #'
+#' @export
+#'
 #' @importFrom magrittr %>%
 #'
 #' @examples

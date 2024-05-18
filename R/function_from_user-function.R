@@ -11,6 +11,8 @@
 #'
 #' @export
 #'
+#' @importFrom magrittr %>%
+#'
 #' @examples
 #'
 #' function_B <- function(n){ rnorm(n, mean = 90, sd = 5) }

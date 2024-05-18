@@ -19,6 +19,10 @@
 #'
 #' @export
 #'
+#' @importFrom magrittr %>%
+#' @importFrom igraph graph_from_data_frame is_dag
+#' @importFrom purrr pmap
+#'
 #' @examples
 #'
 #' data(functions)

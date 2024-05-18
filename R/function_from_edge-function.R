@@ -10,6 +10,10 @@
 #'
 #' @export
 #'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr select pull filter
+#' @importFrom tidyr gather
+#'
 #' @examples
 #'
 #' data(edges)

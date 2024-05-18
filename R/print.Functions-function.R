@@ -8,6 +8,8 @@
 #'
 #' @keywords function
 #'
+#' @importFrom magrittr %>%
+#'
 #' @examples
 #'
 #' data(edges)

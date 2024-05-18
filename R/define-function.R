@@ -16,6 +16,8 @@
 #'
 #' @export
 #'
+#' @importFrom magrittr %>%
+#'
 #' @examples
 #'
 #' data(edges)

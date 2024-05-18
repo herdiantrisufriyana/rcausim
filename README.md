@@ -92,7 +92,7 @@ data(functions)
 
 # Generate simulated data
 simulated_data <- data_from_function(functions, n = 100)
-print(simulated data)
+print(simulated_data)
 ```
 
 

@@ -9,9 +9,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-### Define Functions and Edges
+# Define Functions and Edges
 
-#### Defining Causal Structure
+## Defining Causal Structure
 
 Start by defining the causal structure as a data frame of edges:
 
@@ -40,7 +40,7 @@ functions <- define(functions, 'B', function_B)
 print(functions)
 ```
 
-#### Alternatively, Start by Defining Functions
+## Alternatively, Start by Defining Functions
 
 You can also start by defining functions directly:
 
@@ -69,7 +69,7 @@ g <- graph_from_data_frame(edges, directed = TRUE)
 is_dag(g)
 ```
 
-### Data Simulation
+# Data Simulation
 
 Generate simulated data based on the predefined functions:
 

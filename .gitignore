@@ -63,4 +63,4 @@ renv/*
 .DS_Store
 
 # Ignore build intermediary outputs
-/Meta/
+Meta/

@@ -5,7 +5,7 @@
 #' of the list must be functions.
 #'
 #' @return A list of functions. It can be an input for generating the simulated
-#' data, or redefined by a user using \code(define) function.
+#' data, or redefined by a user using \code{define} function.
 #'
 #' @keywords function
 #'

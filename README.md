@@ -100,11 +100,13 @@ print(simulated_data)
 
 Explore detailed examples and methodologies in the following vignettes:
 
-- [**Causal Simulation Exemplar**](https://htmlpreview.github.io/?https://github.com/herdiantrisufriyana/rcausim/blob/master/vignettes/causal-simulation-exemplar.html): A guide through basic causal simulation scenarios demonstrating how to use `rcausim` to set up and simulate data.
+- [**Quick Start**](https://htmlpreview.github.io/?https://github.com/herdiantrisufriyana/rcausim/blob/master/doc/quick_start.html): Get started quickly with the `rcausim` package. This vignette offers a practical introduction to the essential features, providing a quick glimpse into how you can effectively use the package to generate causally-simulated data.
 
-- [**Algorithmic Data Generation**](https://htmlpreview.github.io/?https://github.com/herdiantrisufriyana/rcausim/blob/master/vignettes/algorithmic-data-generation.html): Use algorithmic approach to define functions or edges in `rcausim`, given a rule, e.g., the number of confounders, colliders, and mediators. This vignette details how to programmatically set up complex causal structures.
+- [**Causal Simulation Exemplar**](https://htmlpreview.github.io/?https://github.com/herdiantrisufriyana/rcausim/blob/master/doc/causal_simulation_exemplar.html): A guide through basic causal simulation scenarios demonstrating how to use `rcausim` to set up and simulate data.
 
-- [**Real-World Causal Structure**](https://htmlpreview.github.io/?https://github.com/herdiantrisufriyana/rcausim/blob/master/vignettes/real-world-causal-structure.html): Demonstrates the application of `rcausim` to simulate data based on complex, real-world causal structures.
+- [**Algorithmic Data Generation**](https://htmlpreview.github.io/?https://github.com/herdiantrisufriyana/rcausim/blob/master/doc/algorithmic_data_generation.html): Use algorithmic approach to define functions or edges in `rcausim`, given a rule, e.g., the number of confounders, colliders, and mediators. This vignette details how to programmatically set up complex causal structures.
+
+- [**Real-World Causal Structure**](https://htmlpreview.github.io/?https://github.com/herdiantrisufriyana/rcausim/blob/master/doc/real_world_causal_structure.html): Demonstrates the application of `rcausim` to simulate data based on complex, real-world causal structures.
 
 - [**Reference Manual**](https://github.com/herdiantrisufriyana/rcausim/blob/master/extras/rcausim_0.0.0.9000.pdf): Comprehensive documentation of all functions and features available in `rcausim`. Ideal for detailed reference and advanced use cases.
 

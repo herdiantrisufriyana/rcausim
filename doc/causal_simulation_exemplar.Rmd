@@ -19,12 +19,23 @@ library(ggnetwork)
 library(tidyverse)
 ```
 
-We will use X and Y respectively to denote a cause and an effect. Both are represented as nodes in a graph. If there is a cause-and-effect relationship between both, then an edge is drawn from X to Y. To do this, we need a 2-column data frame: (1) from, and (2) to.
+```{r include=FALSE}
+library(knitr)
+library(kableExtra)
+library(ggpubr)
+```
+
+We will use \(X\) and \(Y\) respectively to denote a cause and an effect. Both are represented as nodes in a graph. If there is a cause-and-effect relationship between both, then an edge is drawn from \(X\) to \(Y\). To do this, we need a 2-column data frame: (1) from, and (2) to.
 
 ```{r}
 # Create a data frame for the X and Y relationship
 d <- data.frame(from = "X", to = "Y")
-print(d)
+```
+
+```{r echo=FALSE}
+d %>%
+  kable() %>%
+  kable_classic()
 ```
 
 We convert the data frame into an igraph object as a directed graph.
@@ -35,15 +46,21 @@ g <- graph_from_data_frame(d, directed = TRUE)
 print(g)
 ```
 
-To visualize the graph, we need to automatically determine the coordinates to plot X and Y and draw a line from X to Y.
+To visualize the graph, we need to automatically determine the coordinates to plot \(X\) and \(Y\) and draw a line from \(X\) to \(Y\).
 
 ```{r}
 # Lay out the graph as a tree
 g_layout <- layout_as_tree(g)
 
 # Determine the coordinates with ggnetwork
+set.seed(1)
 g_coord <- ggnetwork(g, layout = g_layout)
-print(g_coord)
+```
+
+```{r echo=FALSE}
+g_coord %>%
+  kable() %>%
+  kable_classic()
 ```
 
 To draw the graph, we utilize `ggplot` for its flexibility in customizing graph aesthetics. Use closed and curved arrows to clearly indicate the direction of the causal effect and helps prevent overlapping of arrows.
@@ -73,13 +90,13 @@ print(g_plot)
 
 ## Vertex and edge
 
-A variable is represented as a vertex, and a path is represented as an edge(s). Two variables may have a path between them.
+A variable is represented as a vertex, and a path is represented as an edge(s). Two variables may have a path between them. It means \(X\) and \(Y\) are dependent.
 
 ```{r echo=FALSE}
 print(g_plot)
 ```
 
-It is also possible for two variables to have no path between them.
+It is also possible for two variables to have no path between them. It means \(X\) and \(Y\) are independent.
 
 ```{r echo=FALSE}
 g_coord %>%
@@ -98,9 +115,10 @@ If two variables have a path between them, there are four possible paths. First,
 print(g_plot)
 ```
 
-Second, a path consists of more than one edges with mediator(s). A mediator is connected by two edges: one from X to M and another from M to Y.
+Second, a path consists of more than one edges with mediator(s). A mediator is connected by two edges: one from \(X\) to \(M\) and another from \(M\) to \(Y\).
 
 ```{r echo=FALSE}
+set.seed(1)
 data.frame(from = "X", to = "M") %>%
   add_row(data.frame(from = "M", to = "Y")) %>%
   graph_from_data_frame(directed = TRUE) %>%
@@ -113,9 +131,10 @@ data.frame(from = "X", to = "M") %>%
   theme_void()
 ```
 
-Third, a path consists of more than one edges with confounder(s). A confounder is connected by two edges: one to X and another to Y.
+Third, a path consists of more than one edges with confounder(s). A confounder is connected by two edges: one to \(X\) and another to \(Y\).
 
 ```{r echo=FALSE}
+set.seed(1)
 data.frame(from = "C", to = "X") %>%
   add_row(data.frame(from = "C", to = "Y")) %>%
   graph_from_data_frame(directed = TRUE)%>%
@@ -126,9 +145,10 @@ data.frame(from = "C", to = "X") %>%
   theme_void()
 ```
 
-Fourth, a path consists of more than one edges with collider(s). A collider is connected by two edges coming from X and Y to K.
+Fourth, a path consists of more than one edges with collider(s). A collider is connected by two edges coming from \(X\) and \(Y\) to \(K\).
 
 ```{r echo=FALSE}
+set.seed(1)
 data.frame(from = "X", to = "K") %>%
   add_row(data.frame(from = "Y", to = "K")) %>%
   graph_from_data_frame(directed = TRUE) %>%
@@ -158,23 +178,20 @@ path1_functions <- function_from_edge(d)
 print(path1_functions)
 ```
 
-Next, we define a function for X that generates a normally distributed numeric vector of length `n`.
+Next, we define a function for \(X\) that generates a normally distributed numeric vector of length `n`.
 
 ```{r}
 function_X <- function(n){
-  X <- rnorm(n, mean = 0, sd = 5)
+  X <- rnorm(n, mean = 0, sd = 1)
   return(X)
 }
 ```
 
-For Y, we create an additive function that is dependent on `X`, modeling Y as a binary categorical variable influenced by X.
+For Y, we create a linear function that is dependent on `X` for \(Y\).
 
 ```{r}
 function_Y <- function(X){
-  Y_num <- 0.7 * X
-  Y_prob <- 1/(1 + exp(-Y_num))
-  Y_cat <- ifelse(Y_prob>0.5,1,0)
-  Y <- factor(Y_cat)
+  Y <- 0.5 * X + rnorm(length(X), mean = 0.1, sd = 0.005)
   return(Y)
 }
 ```
@@ -191,63 +208,75 @@ Generate data using `path1_functions`.
 
 ```{r}
 set.seed(1)
-path1_data <- data_from_function(path1_functions, n = 50000)
-head(path1_data)
+path1_data <- data_from_function(path1_functions, n = 25000)
 ```
 
-Finally, we perform a logistic regression to infer the correlation between X and Y.
-
-```{r echo=TRUE, results='hide', message=FALSE, warning=FALSE}
-path1_reg <- glm(Y ~ X, family = binomial(), data = path1_data)
+```{r echo=FALSE}
+path1_data %>%
+  head() %>%
+  kable() %>%
+  kable_classic()
 ```
+
+Finally, we perform a regression to infer the correlation between 
+\(X\) and \(Y\).
 
 ```{r}
-tidy(path1_reg)
+path1_reg <- lm(Y ~ X, data = path1_data)
+path1_results <- tidy(path1_reg)
 ```
 
-This output should show the estimated coefficients, their standard errors, z-values, and p-values. If X has a significant effect on Y (p-value <0.05), we can infer a statistical relationship.
+```{r echo=FALSE}
+path1_results %>%
+  kable() %>%
+  kable_classic()
+```
 
-For the second path involving a mediator M, we create a new data frame `d2`. This data frame specifies the causal paths from X to M and then from M to Y.
+This output should show the estimated coefficients, their standard errors, \(z\)-values, and \(p\)-values. Results shows that \(X\) has a significant effect on \(Y\) (\(p\)-value <0.05). The estimated coefficients reflect the data generation process, providing a consistency check for our simulation.
+
+For the second path involving a mediator \(M\), we create a new data frame `d2`. This data frame specifies the causal paths from \(X\) to \(M\) and then from \(M\) to \(Y\).
 
 ```{r}
 d2 <- data.frame(from = "X", to = "M")
 d2 <- add_row(d2, data.frame(from = "M", to = "Y"))
-print(d2)
 ```
 
-A new class of `Functions` is defined using `d2` to establish the second path which involves a mediator. This step helps clarify the arguments in each functions of X, M, and Y.
+```{r echo=FALSE}
+d2 %>%
+  kable() %>%
+  kable_classic()
+```
+
+A new class of `Functions` is defined using `d2` to establish the second path which involves a mediator. This step helps clarify the arguments in each function of \(X\), \(M\), and \(Y\).
 
 ```{r}
 path2_functions <- function_from_edge(d2)
 print(path2_functions)
 ```
 
-We reuse the same function for X, where X is generated from a normal distribution.
+We reuse the same function for \(X\), where \(X\) is generated from a normal distribution.
 
 ```{r}
 function_X <- function(n){
-  X <- rnorm(n, mean = 0, sd = 5)
+  X <- rnorm(n, mean = 0, sd = 1)
   return(X)
 }
 ```
 
-We also define a function for M, which is directly influenced by X.
+We also define a function for \(M\), which is directly influenced by \(X\).
 
 ```{r}
 function_M <- function(X){
-  M <- rnorm(length(X), mean = 1.5, sd = 1) * X
+  M <- 0.7 * X + rnorm(length(X), mean = 0.3, sd = 0.005)
   return(M)
 }
 ```
 
-Finally, we define a function for Y as a logistic function of M.
+Finally, we define a function for \(Y\) as a linear function of \(M\).
 
 ```{r}
 function_Y <- function(M){
-  Y_num <- 0.7 * M
-  Y_prob <- 1/(1 + exp(-Y_num))
-  Y_cat <- ifelse(Y_prob>0.5,1,0)
-  Y <- factor(Y_cat)
+  Y <- 0.5 * M + rnorm(length(M), mean = 0.1, sd = 0.005)
   return(Y)
 }
 ```
@@ -265,33 +294,45 @@ With `path2_functions`, we generate data that represent the second path.
 
 ```{r}
 set.seed(1)
-path2_data <- data_from_function(path2_functions, n = 50000)
-head(path2_data)
+path2_data <- data_from_function(path2_functions, n = 25000)
 ```
 
-Another logistic regression is performed to infer the correlation between X and Y.
-
-```{r echo=TRUE, results='hide', message=FALSE, warning=FALSE}
-path2_reg <- glm(Y ~ X, family = binomial(), data = path2_data)
+```{r echo=FALSE}
+path2_data %>%
+  head() %>%
+  kable() %>%
+  kable_classic()
 ```
+
+Another regression is performed to infer the correlation between \(X\) and \(Y\).
 
 ```{r}
-tidy(path2_reg)
+path2_reg <- lm(Y ~ X, data = path2_data)
+path2_results <- tidy(path2_reg)
 ```
 
-In this case, the regression results indicate that X has a significant effect on Y with a p-value <0.05, demonstrating that X still exerts a significant direct effect on Y， although the effect is mediated by M.
+```{r echo=FALSE}
+path2_results %>%
+  kable() %>%
+  kable_classic()
+```
+
+In our data generation process, \(M\) is defined as \(0.7 \times X + 0.3\), and \(Y\) as \(0.5 \times M + 0.1\); therefore, \(Y(X)\) equals \(0.5 \times (0.7 \times X + 0.3) + 0.1\). Solving this equation, we find that the estimated coefficients reflect the data generation process.
 
 ## The third path allows correlation although there is no causation
 
-In the third path, both X and Y are influenced by C, as shown in `d3` below.
+In the third path, both \(X\) and \(Y\) are influenced by \(C\), as shown in `d3` below.
 
 ```{r}
 d3 <- data.frame(from = "C", to = "X")
 d3 <- add_row(d3, data.frame(from = "C", to = "Y"))
-print(d3)
 ```
 
-The arguments for the functions of X, C, and Y are clarified.
+```{r echo=FALSE}
+d3 %>%
+  kable() %>%
+  kable_classic()
+```
 
 We clarify the arguments in the functions for each variable based on the data frame `d3`.
 
@@ -300,32 +341,29 @@ path3_functions <- function_from_edge(d3)
 print(path3_functions)
 ```
 
-We define a normal distribution for C.
+We define a normal distribution for \(C\).
 
 ```{r}
 function_C <- function(n){
-  C <- rnorm(n, mean = 0, sd = 5)
+  C <- rnorm(n, mean = 0, sd = 1)
   return(C)
 }
 ```
 
-The value of X depends on C.
+The value of \(X\) depends on \(C\).
 
 ```{r}
 function_X <- function(C){
-  X <- rnorm(length(C), mean = 1.5, sd = 1) * C
+  X <- 0.7 * C + rnorm(length(C), mean = 0.3, sd = 0.005)
   return(X)
 }
 ```
 
-Similarly, Y also depends on C.
+Similarly, \(Y\) also depends on \(C\).
 
 ```{r}
 function_Y <- function(C){
-  Y_num <- 0.7 * C
-  Y_prob <- 1/(1 + exp(-Y_num))
-  Y_cat <- ifelse(Y_prob>0.5,1,0)
-  Y <- factor(Y_cat)
+  Y <- 0.5 * C + rnorm(length(C), mean = 0.1, sd = 0.005)
   return(Y)
 }
 ```
@@ -343,70 +381,76 @@ Data is generated using `path3_functions`.
 
 ```{r}
 set.seed(1)
-path3_data <- data_from_function(path3_functions, n = 50000)
-head(path3_data)
+path3_data <- data_from_function(path3_functions, n = 25000)
 ```
 
-A logistic regression examines the correlation between X and Y.
-
-```{r echo=TRUE, results='hide', message=FALSE, warning=FALSE}
-path3_reg <- glm(Y ~ X, family = binomial(), data = path3_data)
+```{r echo=FALSE}
+path3_data %>%
+  head() %>%
+  kable() %>%
+  kable_classic()
 ```
+
+A regression examines the correlation between \(X\) and \(Y\).
 
 ```{r}
-tidy(path3_reg)
+path3_reg <- lm(Y ~ X, data = path3_data)
+path3_results <- tidy(path3_reg)
 ```
 
-Results indicate a statistically significant correlation between X and Y, although there is no edge directly from X to Y.
+```{r echo=FALSE}
+path3_results %>%
+  kable() %>%
+  kable_classic()
+```
+
+Results indicate a statistically significant correlation between \(X\) and \(Y\), although there is no edge directly from \(X\) to \(Y\). Notably, the coefficients are not identical to those used in the data generation process.
 
 ## The fourth path allows neither correlation nor causation
 
-In this path, both X and Y both influence K but do not influence each other. This scenario is illustrated by `d4`.
+In this path, both \(X\) and \(Y\) both influence \(K\) but do not influence each other. This scenario is illustrated by `d4`.
 
 ```{r}
 d4 <- data.frame(from = "X", to = "K")
 d4 <- add_row(d4, data.frame(from = "Y", to = "K"))
-print(d4)
 ```
 
-A class of `Functions` is created to clarify the arguments in the functions for X, Y, and K.
+```{r echo=FALSE}
+d4 %>%
+  kable() %>%
+  kable_classic()
+```
+
+A class of `Functions` is created to clarify the arguments in the functions for \(X\), \(Y\), and \(K\).
 
 ```{r}
 path4_functions <- function_from_edge(d4)
 print(path4_functions)
 ```
 
-The function for X determines its values to be normally-distributed.
+The function for \(X\) determines its values to be normally-distributed.
 
-Both X and Y are independently defined with normally distributed values.
+Both \(X\) and \(Y\) are independently defined with normally distributed values.
 
 ```{r}
 function_X <- function(n){
-  X <- rnorm(n, mean = 0, sd = 5)
+  X <- rnorm(n, mean = 0, sd = 1)
   return(X)
 }
 ```
 
 ```{r}
 function_Y <- function(n){
-  Y_num <- 0.7 * rnorm(n, mean = 0, sd = 5)
-  Y_prob <- 1/(1 + exp(-Y_num))
-  Y_cat <- ifelse(Y_prob>0.5,1,0)
-  Y <- factor(Y_cat)
+  Y <- rnorm(n, mean = 0.1, sd = 0.005)
   return(Y)
 }
 ```
 
-The value of K depends on both X and Y.
+The value of \(K\) depends on both \(X\) and \(Y\).
 
 ```{r}
 function_K <- function(X, Y){
-  K_num <- 0.7 * X
-  K_prob <- 1/(1 + exp(-K_num))
-  Y_num <- 0.3 * as.numeric(Y)
-  K_prob <- K_prob + Y_num
-  K_cat <- ifelse(K_prob>0.5,1,0)
-  K <- factor(K_cat)
+  K <- 0.7 * X + 0.5 * Y + rnorm(length(X), mean = 0.1, sd = 0.005)
   return(K)
 }
 ```
@@ -424,20 +468,463 @@ Finally, data are generated using `path4_functions`
 
 ```{r}
 set.seed(1)
-path4_data <- data_from_function(path4_functions, n = 50000)
-head(path4_data)
+path4_data <- data_from_function(path4_functions, n = 25000)
 ```
 
-We then evaluate the correlation between X and Y by conducting a logistic regression.
-
-```{r echo=TRUE, results='hide', message=FALSE, warning=FALSE}
-path4_reg <- glm(Y ~ X, family = binomial(), data = path4_data)
+```{r echo=FALSE}
+path4_data %>%
+  head() %>%
+  kable() %>%
+  kable_classic()
 ```
+
+We then evaluate the correlation between \(X\) and \(Y\) by conducting a regression.
 
 ```{r}
-tidy(path4_reg)
+path4_reg <- lm(Y ~ X, data = path4_data)
+path4_results <- tidy(path4_reg)
+```
+
+```{r echo=FALSE}
+path4_results %>%
+  kable() %>%
+  kable_classic()
 ```
 
 Results shows no significant correlation between X and Y, although there is a path between them.
 
+# Causal Discovery
 
+Among the four paths, only the first and second paths represent causal relationships, while the others are non-causal. We can guess the causal structure based on these properties using directional (\(d\))-separation. It is a criterion used to determine whether a set of variables, \(Z\), provides conditional independence between the pair of other variables (i.e., \(X\) and \(Y\)) within a causal graph.
+
+Specifically, we need to identify if \(X\) and \(Y\) are dependent, then we condition them on \(Z\). If \(X\) and \(Y\) is conditionally independent, then there is no causal path between them. The rules of \(d\)-separation are:
+
+1.	The path contains a mediator \(X \rightarrow M \rightarrow Y\) or a confounder \(X \leftarrow C \rightarrow Y\) where both \(M\) and \(C\) are in \(Z\); and
+2.	The path contains a collider \(X \rightarrow K \leftarrow Y\) where \(K\) is not in Z and none in Z is dependent on \(K\).
+
+Notably, when determining causal relationships, we include \(M\) in \(Z\) only if we aim to identify if there are any causal paths from \(X\) to \(Y\) that do not pass through \(M\).
+
+Now, we create additional versions of the second, third, and fourth paths, each including the first path. These versions, without and with the first path, represent scenarios in which the null hypothesis and the alternative hypothesis are respectively accepted.
+
+```{r}
+d2_with_d <- add_row(d2, d)
+d3_with_d <- add_row(d3, d)
+d4_with_d <- add_row(d4, d)
+```
+
+```{r include=FALSE}
+d234_list <- list(d2_with_d, d3_with_d, d4_with_d)
+
+d234_g <- lapply(d234_list, graph_from_data_frame)
+
+d234_g_layout <- lapply(d234_g, layout_as_tree)
+set.seed(1)
+d234_g_coord <- mapply(ggnetwork, d234_g, d234_g_layout, SIMPLIFY = FALSE)
+
+d234_g_coord[[4]] <- slice(d234_g_coord[[1]], -3)
+d234_g_coord[[5]] <- slice(d234_g_coord[[2]], -3)
+d234_g_coord[[6]] <- slice(d234_g_coord[[3]], -2)
+
+d234_g_plots <-
+  d234_g_coord %>%
+  lapply(\(x)
+    x %>%
+      ggplot(aes(x, y, xend = xend, yend = yend)) +
+      geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+      geom_nodelabel(aes(label = name))
+  )
+
+d234_g_plots[c(1, 4)] <-
+  d234_g_plots[c(1, 4)] %>%
+  lapply(\(x)
+    x +
+      coord_flip() +
+      scale_x_reverse()
+  )
+
+d234_g_plots[c(2, 5)] <-
+  d234_g_plots[c(2, 5)] %>%
+  lapply(\(x)
+    x +
+      scale_x_reverse() +
+      scale_y_reverse()
+  )
+
+d234_g_plots[c(3, 6)] <-
+  d234_g_plots[c(3, 6)] %>%
+  lapply(\(x)
+    x +
+      coord_flip() +
+      scale_x_reverse() +
+      scale_y_reverse()
+  )
+
+d234_g_plots <-
+  d234_g_plots %>%
+  lapply(\(x) x + theme_void())
+```
+
+## The second path without and with the first path
+
+Below we outline the data generation process in which the null hypothesis (left) and the alternative hypothesis (right) are accepted.
+
+```{r echo=FALSE}
+ggarrange(
+  d234_g_plots[[4]]
+  ,d234_g_plots[[1]]
+)
+```
+
+A regression was already conducted for the second path without the first path, identified as `path2_results`. We need to apply the same analysis to the version with the first path.
+
+```{r}
+path2_d_functions <- function_from_edge(d2_with_d)
+print(path2_d_functions)
+```
+
+```{r}
+function_X <- function(n){
+  X <- rnorm(n, mean = 0, sd = 1)
+  return(X)
+}
+
+function_M <- function(X){
+  M <- 0.7 * X + rnorm(length(X), mean = 0.3, sd = 0.005)
+  return(M)
+}
+
+function_Y <- function(X, M){
+  Y <- 0.25 * X + 0.5 * M + rnorm(length(X), mean = 0.1, sd = 0.005)
+  return(Y)
+}
+
+path2_d_functions <- define(path2_d_functions, which = "X", what = function_X)
+path2_d_functions <- define(path2_d_functions, which = "M", what = function_M)
+path2_d_functions <- define(path2_d_functions, which = "Y", what = function_Y)
+
+set.seed(1)
+path2_d_data <- data_from_function(path2_d_functions, n = 25000)
+path2_d_reg <- lm(Y ~ X, data = path2_d_data)
+path2_d_results <- tidy(path2_d_reg)
+```
+
+We condition each version on \(Z\). In this case, it includes \(M\) to identify any causal paths from \(X\) to \(Y\) that do not pass through \(M\).
+
+```{r}
+path2_cond_reg <- lm(Y ~ X + M, data = path2_data)
+path2_cond_results <- tidy(path2_cond_reg)
+
+path2_cond_d_reg <- lm(Y ~ X + M, data = path2_d_data)
+path2_cond_d_results <- tidy(path2_cond_d_reg)
+```
+
+```{r echo=FALSE}
+rbind(
+  path2_results %>%
+    mutate(first_path = "No", conditioned = "No")
+  ,path2_cond_results %>%
+    mutate(first_path = "No", conditioned = "Yes")
+  ,path2_d_results %>%
+    mutate(first_path = "Yes", conditioned = "No")
+  ,path2_cond_d_results %>%
+    mutate(first_path = "Yes", conditioned = "Yes")
+) %>%
+  select(first_path, conditioned, everything()) %>%
+  kable() %>%
+  kable_classic()
+```
+
+The regression results show that the coefficient of \(X\) is reduced from approximately 0.35 to nearly 0 when we condition on \(Z\) (which includes the mediator \(M\)) in the first version. When conditioning the second version on \(Z\), the coefficient of \(X\) is also reduced, from about 0.60 to 0.26; however, the effect of \(X\) on \(Y\) remains significant. This indicates that in the first scenario, conditioning on \(M\) successfully blocks the path from \(X\) to \(Y\), supporting the hypothesis of \(M\) being a complete mediator. In contrast, in the second scenario, \(M\) does not completely mediate the relationship between \(X\) and \(Y\), as \(X\) still has a direct effect on \(Y\).
+
+## The third path without and with the first path
+
+We now apply the data generation process similarly, but in this instance, \(Z\) includes \(C\), as illustrated below.
+
+```{r echo=FALSE}
+ggarrange(
+  d234_g_plots[[2]]
+  ,d234_g_plots[[5]]
+)
+```
+
+In addition to `path3_results` for the first version, we need to conduct a regression analysis for the second version.
+
+```{r}
+path3_d_functions <- function_from_edge(d3_with_d)
+print(path3_d_functions)
+```
+
+```{r}
+function_C <- function(n){
+  X <- rnorm(n, mean = 0, sd = 1)
+  return(X)
+}
+
+function_X <- function(C){
+  X <- 0.7 * C + rnorm(length(C), mean = 0.3, sd = 0.005)
+  return(X)
+}
+
+function_Y <- function(X, C){
+  Y <- 0.25 * X + 0.5 * C + rnorm(length(C), mean = 0.1, sd = 0.005)
+  return(Y)
+}
+
+path3_d_functions <- define(path3_d_functions, which = "C", what = function_C)
+path3_d_functions <- define(path3_d_functions, which = "X", what = function_X)
+path3_d_functions <- define(path3_d_functions, which = "Y", what = function_Y)
+
+set.seed(1)
+path3_d_data <- data_from_function(path3_d_functions, n = 25000)
+path3_d_reg <- lm(Y ~ X, data = path3_d_data)
+path3_d_results <- tidy(path3_d_reg)
+```
+
+Both versions are conditioned on \(Z\) to determine any causal paths from \(X\) to \(Y\) that can be identified when the non-causal path involving \(C\) is blocked.
+
+```{r}
+path3_cond_reg <- lm(Y ~ X + C, data = path3_data)
+path3_cond_results <- tidy(path3_cond_reg)
+
+path3_cond_d_reg <- lm(Y ~ X + C, data = path3_d_data)
+path3_cond_d_results <- tidy(path3_cond_d_reg)
+```
+
+```{r echo=FALSE}
+rbind(
+  path3_results %>%
+    mutate(first_path = "No", conditioned = "No")
+  ,path3_cond_results %>%
+    mutate(first_path = "No", conditioned = "Yes")
+  ,path3_d_results %>%
+    mutate(first_path = "Yes", conditioned = "No")
+  ,path3_cond_d_results %>%
+    mutate(first_path = "Yes", conditioned = "Yes")
+) %>%
+  select(first_path, conditioned, everything()) %>%
+  kable() %>%
+  kable_classic()
+```
+
+For the first version, the coefficient of \(X\) is significantly reduced from approximately 0.7 to nearly 0 when we condition on \(Z\) (which includes the confounder \(C\)). In the second version, the coefficient is reduced from 0.96 to 0.24; however, \(X\) still exerts a significant effect on \(Y\).
+
+## The fourth path without and with the first path
+
+Unlike the second and third paths, the fourth path exhibits an opposite result when we condition the effect of \(X\) on \(Y\).
+
+```{r echo=FALSE}
+ggarrange(
+  d234_g_plots[[3]]
+  ,d234_g_plots[[6]]
+  ,labels = LETTERS[5:6]
+)
+```
+
+We proceed with a similar analysis.
+
+```{r}
+path4_d_functions <- function_from_edge(d4_with_d)
+print(path4_d_functions)
+```
+
+```{r}
+function_X <- function(n){
+  X <- rnorm(n, mean = 0, sd = 1)
+  return(X)
+}
+
+function_Y <- function(X){
+  Y <- 0.5 * X + rnorm(length(X), mean = 0.1, sd = 0.005)
+  return(Y)
+}
+
+function_K <- function(X, Y){
+  K <- 0.7 * X + 0.5 * Y + rnorm(length(X), mean = 0.1, sd = 0.005)
+  return(K)
+}
+
+path4_d_functions <- define(path4_d_functions, which = "X", what = function_X)
+path4_d_functions <- define(path4_d_functions, which = "Y", what = function_Y)
+path4_d_functions <- define(path4_d_functions, which = "K", what = function_K)
+
+set.seed(1)
+path4_d_data <- data_from_function(path4_d_functions, n = 25000)
+path4_d_reg <- lm(Y ~ X, data = path4_d_data)
+path4_d_results <- tidy(path4_d_reg)
+```
+
+is also condition on \(Z\) which includes \(K\). Notably, this approach violates the rules of \(d\)-separation.
+
+```{r}
+path4_cond_reg <- lm(Y ~ X + K, data = path4_data)
+path4_cond_results <- tidy(path4_cond_reg)
+
+path4_cond_d_reg <- lm(Y ~ X + K, data = path4_d_data)
+path4_cond_d_results <- tidy(path4_cond_d_reg)
+```
+
+```{r echo=FALSE}
+rbind(
+  path4_results %>%
+    mutate(first_path = "No", conditioned = "No")
+  ,path4_cond_results %>%
+    mutate(first_path = "No", conditioned = "Yes")
+  ,path4_d_results %>%
+    mutate(first_path = "Yes", conditioned = "No")
+  ,path4_cond_d_results %>%
+    mutate(first_path = "Yes", conditioned = "Yes")
+) %>%
+  select(first_path, conditioned, everything()) %>%
+  kable() %>%
+  kable_classic()
+```
+
+Now, we can observe why including \(K\) in \(Z\) is problematic. In the first version, the coefficient of \(X\) changes from nearly 0 to -0.28, indicating a significant effect on \(Y\). In our data generation process for this scenario, \(X\) and \(Y\) are independent. In the second version, they are dependent, but conditioning on \(Z\) reverses the effect in the same direction observed in the first version. Hence, including \(K\) in \(Z\) reverses the relationship between a pair of other variables in a causal graph.
+
+# Causal Effect Estimation
+
+```{r}
+d5 <- data.frame(from = "X1", to = "Y")
+d5 <- add_row(d5, data.frame(from = "X2", to = "Y"))
+```
+
+```{r echo=FALSE}
+set.seed(1)
+d5 %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+```
+
+```{r}
+d5_functions <- function_from_edge(d5)
+print(d5_functions)
+```
+
+```{r}
+function_X1 <- function(n){
+  X1 <- sample(c(0, 1), n, replace = T)
+  return(X1)
+}
+
+function_X2 <- function(n){
+  X2 <- sample(c(0, 1), n, replace = T)
+  return(X2)
+}
+
+function_Y <- function(X1, X2){
+  Y <- as.numeric(X1 == 1 & X2 == 1)
+  return(Y)
+}
+
+d5_functions <- define(d5_functions, which = "X1", what = function_X1)
+d5_functions <- define(d5_functions, which = "X2", what = function_X2)
+d5_functions <- define(d5_functions, which = "Y", what = function_Y)
+
+set.seed(1)
+d5_data <- data_from_function(d5_functions, n = 25000)
+d5_reg <- lm(Y ~ X1 + X2, data = d5_data)
+d5_results <- tidy(d5_reg)
+```
+
+```{r echo=FALSE}
+d5_results %>%
+  kable() %>%
+  kable_classic()
+```
+
+```{r}
+test_data <- expand.grid(X1 = c(0, 1), X2 = c(0, 1))
+d5_test <- mutate(test_data, Y = mapply(function_Y, X1, X2))
+d5_test <- mutate(d5_test, Y_hat = predict(d5_reg, newdata = d5_test))
+d5_test <- mutate(d5_test, Y_hat = round(Y_hat))
+```
+
+```{r echo=FALSE}
+d5_test %>%
+  kable() %>%
+  kable_classic()
+```
+
+```{r}
+d6_functions <- function_from_edge(d5)
+
+function_Y <- function(X1, X2){
+  Y <- as.numeric(X1 == 1 | X2 == 1)
+  return(Y)
+}
+
+d6_functions <- define(d6_functions, which = "X1", what = function_X1)
+d6_functions <- define(d6_functions, which = "X2", what = function_X2)
+d6_functions <- define(d6_functions, which = "Y", what = function_Y)
+
+set.seed(1)
+d6_data <- data_from_function(d6_functions, n = 25000)
+d6_reg <- lm(Y ~ X1 + X2, data = d6_data)
+d6_results <- tidy(d6_reg)
+
+d6_test <- mutate(test_data, Y = mapply(function_Y, X1, X2))
+d6_test <- mutate(d6_test, Y_hat = predict(d6_reg, newdata = d6_test))
+d6_test <- mutate(d6_test, Y_hat = round(Y_hat))
+```
+
+```{r echo=FALSE}
+d6_results %>%
+  kable() %>%
+  kable_classic()
+```
+
+```{r echo=FALSE}
+d6_test %>%
+  kable() %>%
+  kable_classic()
+```
+
+```{r}
+d7_functions <- function_from_edge(d5)
+
+function_Y <- function(X1, X2){
+  Y <- as.numeric((X1 == 1 & X2 == 0) | (X1 == 0 & X2 == 1))
+  return(Y)
+}
+
+d7_functions <- define(d7_functions, which = "X1", what = function_X1)
+d7_functions <- define(d7_functions, which = "X2", what = function_X2)
+d7_functions <- define(d7_functions, which = "Y", what = function_Y)
+
+set.seed(1)
+d7_data <- data_from_function(d7_functions, n = 25000)
+d7_reg <- lm(Y ~ X1 + X2, data = d7_data)
+d7_results <- tidy(d7_reg)
+
+d7_test <- mutate(test_data, Y = mapply(function_Y, X1, X2))
+d7_test <- mutate(d7_test, Y_hat = predict(d7_reg, newdata = d7_test))
+d7_test <- mutate(d7_test, Y_hat = round(Y_hat))
+```
+
+```{r echo=FALSE}
+d7_results %>%
+  kable() %>%
+  kable_classic()
+```
+
+```{r echo=FALSE}
+d7_test %>%
+  kable() %>%
+  kable_classic()
+```
+
+# Miscellanous
+
+## Measurement Error
+
+In real world, our data actually only consists of measured variables of the actual variables which mostly, if not all, are latent variables (i.e., abstraction). For example, a variable of a cognitive ability is measured by intelligence quotient (IQ) score. Furthermore, we also categorize IQ score into several categories which are a form of another variable, i.e., IQ category. First, the IQ scoring obviously only capture some of a cognitive ability. There is information loss. When we applied categorization to IQ, more information are lost.
+
+## Missing Value
+
+## Bidirectional Causation

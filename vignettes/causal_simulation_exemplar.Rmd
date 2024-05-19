@@ -926,4 +926,8 @@ In real world, our data actually only consists of measured variables of the actu
 
 ## Missing Value
 
+We can simulate how missing value occurs.
+
 ## Bidirectional Causation
+
+Two variables may affect each other.

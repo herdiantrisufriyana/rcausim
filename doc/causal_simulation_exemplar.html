@@ -614,11 +614,9 @@ graph.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Convert the data frame into an igraph object.</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph_from_data_frame</span>(d, <span class="at">directed =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">print</span>(g)</span></code></pre></div>
-<pre><code>## IGRAPH 357b7be DN-- 2 1 -- 
-<pre><code>## IGRAPH dba9bef DN-- 2 1 -- 
+<pre><code>## IGRAPH d5f1ba4 DN-- 2 1 -- 
 ## + attr: name (v/c)
-## + edge from 357b7be (vertex names):
-## + edge from dba9bef (vertex names):
+## + edge from d5f1ba4 (vertex names):
 ## [1] X-&gt;Y</code></pre>
 <p>To visualize the graph, we need to automatically determine the
 coordinates to plot <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> and draw a line from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>.</p>
@@ -3102,9 +3100,11 @@ applied categorization to IQ, more information are lost.</p>
 </div>
 <div id="missing-value" class="section level2">
 <h2>Missing Value</h2>
+<p>We can simulate how missing value occurs.</p>
 </div>
 <div id="bidirectional-causation" class="section level2">
 <h2>Bidirectional Causation</h2>
+<p>Two variables may affect each other.</p>
 </div>
 </div>
 

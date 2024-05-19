@@ -1,10 +1,18 @@
 ## ----echo=TRUE, results='hide', message=FALSE, warning=FALSE------------------
 library(rcausim)
 
+## ----include=FALSE------------------------------------------------------------
+library(knitr)
+library(kableExtra)
+
 ## -----------------------------------------------------------------------------
 # Load predefined edge data
 data(edges)
-print(edges)
+
+## ----echo=FALSE---------------------------------------------------------------
+edges %>%
+  kable() %>%
+  kable_classic()
 
 ## -----------------------------------------------------------------------------
 # Generate function setups from edge definitions
@@ -44,6 +52,11 @@ is_dag(g)
 data(functions)
 
 # Generate simulated data
+set.seed(1)
 simulated_data <- data_from_function(functions, n = 100)
-head(simulated_data)
+
+## ----echo=FALSE---------------------------------------------------------------
+simulated_data %>%
+  kable() %>%
+  kable_classic()
 

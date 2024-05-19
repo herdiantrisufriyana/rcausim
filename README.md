@@ -95,8 +95,9 @@ Generate simulated data based on the predefined functions:
 data(functions)
 
 # Generate simulated data
+set.seed(1)
 simulated_data <- data_from_function(functions, n = 100)
-head(simulated_data)
+print(simulated_data)
 ```
 
 

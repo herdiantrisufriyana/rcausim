@@ -391,7 +391,7 @@ path3_data %>%
   kable_classic()
 ```
 
-A regression examines the correlation between \(X\) and \(Y\). 
+A regression examines the correlation between \(X\) and \(Y\).
 
 ```{r}
 path3_reg <- lm(Y ~ X, data = path3_data)
@@ -570,8 +570,8 @@ Below we outline the data generation process in which the null hypothesis (left)
 
 ```{r echo=FALSE}
 ggarrange(
-  d234_g_plots[[4]]
-  ,d234_g_plots[[1]]
+  d234_g_plots[[4]],
+  d234_g_plots[[1]]
 )
 ```
 
@@ -642,8 +642,8 @@ We now apply the data generation process similarly, but in this instance, \(Z\) 
 
 ```{r echo=FALSE}
 ggarrange(
-  d234_g_plots[[2]]
-  ,d234_g_plots[[5]]
+  d234_g_plots[[2]],
+  d234_g_plots[[5]]
 )
 ```
 
@@ -714,8 +714,8 @@ Unlike the mediator and confounder paths, the collider path exhibits an opposite
 
 ```{r echo=FALSE}
 ggarrange(
-  d234_g_plots[[3]]
-  ,d234_g_plots[[6]]
+  d234_g_plots[[3]],
+  d234_g_plots[[6]]
 )
 ```
 
@@ -980,12 +980,447 @@ Therefore, a linear regression model cannot accurately estimate the causal effec
 
 ## Measurement Error
 
-In real world, our data actually only consists of measured variables of the actual variables which mostly, if not all, are latent variables (i.e., abstraction). For example, a variable of a cognitive ability is measured by intelligence quotient (IQ) score. Furthermore, we also categorize IQ score into several categories which are a form of another variable, i.e., IQ category. First, the IQ scoring obviously only capture some of a cognitive ability. There is information loss. When we applied categorization to IQ, more information are lost.
+In the real world, our data consist primarily of measurements of actual variables, which are often latent variables (i.e., abstract constructs). For example, cognitive ability is often measured by an intelligence quotient (IQ) score. Furthermore, we also categorize IQ scores into several categories, which represent another form of variable: IQ category. First, IQ scoring captures only a portion of a cognitive ability, leading to information loss. When IQ is further categorized, even more information is lost.
+
+We can represent a measured variable as a vertex to which an edge is drawn from another vertex that represents the actual variable. For instance, consider a causal path from \(X\) to \(Y\). Let's denote their measured variables as \(X'\) and \(Y'\), respectively. Since value of \(X'\) depends on \(X\), and \(Y'\) depends on \(Y\), we draw an edge from \(X\) to \(X'\) and another from \(Y\) to \(Y'\). Therefore, in a causal graph, measurement is simply a form of causal path from an actual to a measured variable.
+
+```{r}
+d8 <- data.frame(from = "X", to = "Y")
+d8 <- add_row(d8, data.frame(from = "X", to = "Xm"))
+d8 <- add_row(d8, data.frame(from = "UX", to = "Xm"))
+d8 <- add_row(d8, data.frame(from = "Y", to = "Ym"))
+d8 <- add_row(d8, data.frame(from = "UY", to = "Ym"))
+```
+
+```{r echo=FALSE}
+set.seed(1)
+d8 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+```
+
+If a measurement error introduced in a set of measured variables depends on the same variable \(U_XY\) (UXY) which is beyond their actual variables, then it is called a dependent measurement error; otherwise, it is independent. The figure below shows independent (left) and dependent (right) measurement errors.
+
+```{r echo=FALSE}
+d8_nondif <- list()
+
+set.seed(1)
+d8_nondif[[1]] <- d8 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 1, name = "UX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0, name = "UY", xend = 1.025, yend = 0)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+set.seed(1)
+d8_nondif[[2]] <- d8 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0.5, name = "UXY", xend = 1, yend = 0.975)) %>%
+  add_row(data.frame(x = 1, y = 0.5, name = "UXY", xend = 1, yend = 0.025)) %>%
+  add_row(data.frame(x = 1, y = 0.5, name = "UXY", xend = 1, yend = 0.5)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+ggarrange(
+  d8_nondif[[1]],
+  d8_nondif[[2]]
+)
+```
+
+If a measurement error introduced in a measured variable depends on any other actual variables beyond its own actual variable, then it is called differential measurement error; otherwise, it is nondifferential. Hence, the previous measurement errors are specifically: (1) independent, nondifferential; and (2) dependent, nondifferential. The figure below shows differential measurement error. Specifically, it shows an independent, differential measurement error. A measurement error of \(Y'\) depends on \(X\) (left), or a measurement error of \(X'\) depends on \(Y\) (right).
+
+```{r echo=FALSE}
+d8_ind_dif <- list()
+
+set.seed(1)
+d8_ind_dif[[1]] <- d8 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 1, name = "UX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0, name = "UY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 1.5, yend = 0.025)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+set.seed(1)
+d8_ind_dif[[2]] <- d8 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 1, name = "UX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0, name = "UY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 1.5, yend = 0.975)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+ggarrange(
+  d8_ind_dif[[1]],
+  d8_ind_dif[[2]]
+)
+```
+
+Therefore, we can categorize measurement errors based on their dependencies and differentials into four types:
+
+1. Independent, nondifferential;
+2. Dependent, nondifferential;
+3. Independent, differential; and
+4. Dependent, differential.
+
+Now, let's generate data with measured variables. We use the same variables and functions but introduce different versions of errors, ranging from smaller to larger errors.
+
+```{r}
+I <- seq(10)
+UX_epsilon <- seq(0.005, 4, length = length(I))
+UY_epsilon <- seq(0.005, 8, length = length(I))
+
+d8_results <- list()
+
+for(i in I){
+  d8_functions <- function_from_edge(d8)
+  
+  function_X <- function(n){
+    X <- rnorm(n, mean = 0, sd = 1)
+    return(X)
+  }
+  
+  function_UX <- function(n){
+    UX <- rnorm(n, mean = 0, sd = UX_epsilon[[i]])
+    return(UX)
+  }
+  
+  function_Xm <- function(X, UX){
+    Xm <- X + UX
+    return(Xm)
+  }
+  
+  function_Y <- function(X){
+    Y <- 0.5 * X + rnorm(length(X), mean = 0.1, sd = 0.005)
+    return(Y)
+  }
+  
+  function_UY <- function(n){
+    UY <- rnorm(n, mean = 0, sd = UY_epsilon[[i]])
+    return(UY)
+  }
+  
+  function_Ym <- function(Y, UY){
+    Ym <- Y + UY
+    return(Ym)
+  }
+  
+  d8_functions <- define(d8_functions, which = "X", what = function_X)
+  d8_functions <- define(d8_functions, which = "UX", what = function_UX)
+  d8_functions <- define(d8_functions, which = "Xm", what = function_Xm)
+  d8_functions <- define(d8_functions, which = "Y", what = function_Y)
+  d8_functions <- define(d8_functions, which = "UY", what = function_UY)
+  d8_functions <- define(d8_functions, which = "Ym", what = function_Ym)
+  
+  set.seed(1)
+  d8_data <- data_from_function(d8_functions, n = 25000)
+  d8_reg <- lm(Ym ~ Xm, data = d8_data)
+  d8_results[[i]] <- tidy(d8_reg)
+}
+```
+
+```{r echo=FALSE}
+d8_results_rbind <- d8_results %>%
+  do.call(rbind,.) %>%
+  group_by(term) %>%
+  mutate(i = seq(n())) %>%
+  ungroup() %>%
+  left_join(
+    data.frame(term = "(Intercept)", i = I, epsilon = UY_epsilon) %>%
+      rbind(
+        data.frame(term = "Xm", i = I, epsilon = UX_epsilon)
+      ),
+    by = join_by(term, i)
+  ) %>%
+  mutate(lb = estimate - qnorm(0.975) * std.error) %>%
+  mutate(ub = estimate + qnorm(0.975) * std.error)
+
+d8_plot <- list()
+
+d8_plot[[1]] <- d8_results_rbind %>%
+  ggplot(aes(epsilon, estimate)) +
+  geom_hline(aes(yintercept = ifelse(term == "Xm", 0.5, 0.1)), lty = 2) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ term, scales = "free")
+
+d8_plot[[2]] <- d8_results_rbind %>%
+  ggplot(aes(epsilon, p.value)) +
+  geom_hline(yintercept = 0.05, lty = 2) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ term, scales = "free")
+
+ggarrange(
+  d8_plot[[1]],
+  d8_plot[[2]],
+  ncol = 1,
+  nrow = 2
+)
+```
+
+We observe that larger errors shift the estimated coefficients away from the true values. An error \(\epsilon\) of 2.11 or more leads to the conclusion that the effect of \(X\) on \(Y\) is not significant, even though it should be significant according to the data-generation process.
 
 ## Missing Value
 
-We can simulate how missing value occurs.
+We can simulate how missing values occur using the same principles as those of measurement error. Missing values introduced in a measured variable depend on its missingness variable \(R\).
+
+There are three types of missing-value mechanisms:
+
+1. Missing completely at random (MCAR): Missing values depend on neither the actual variable nor other variables. In the figure below, both \(X'\) and \(Y'\) demonstrate MCAR.
+
+```{r}
+d9 <- data.frame(from = "X", to = "Y")
+d9 <- add_row(d9, data.frame(from = "X", to = "Xm"))
+d9 <- add_row(d9, data.frame(from = "UX", to = "Xm"))
+d9 <- add_row(d9, data.frame(from = "RX", to = "Xm"))
+d9 <- add_row(d9, data.frame(from = "Y", to = "Ym"))
+d9 <- add_row(d9, data.frame(from = "UY", to = "Ym"))
+d9 <- add_row(d9, data.frame(from = "RY", to = "Ym"))
+```
+
+```{r echo=FALSE}
+set.seed(1)
+d9 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 1, name = "UX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 0.7, name = "RX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0, name = "UY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0.3, name = "RY", xend = 1.025, yend = 0)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+```
+
+2. Missing at random (MAR): Missing values depend on other variables but not on the actual variable. In the figure below, the missingness variable \(R_X\) (RX) depends on \(Y\), while \(R_Y\) (RY) depends on \(X\). Therefore, both \(X'\) and \(Y'\) are MAR.
+
+```{r echo=FALSE}
+set.seed(1)
+d9 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 1, name = "UX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 0.7, name = "RX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 1.5, yend = 0.675)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0, name = "UY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0.3, name = "RY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 1.5, yend = 0.325)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+```
+
+3. Missing not at random (MNAR): Missing values depend on the actual variable, potentially among others. In the figure below, the missingness variable \(R_X\) (RX) depends on \(X\) itself, while \(R_Y\) (RY) depends on \(Y\) itself. Therefore, both \(X'\) and \(Y'\) demonstrate MNAR. This scenario can also includes situations where missingness is influenced by multiple variables. For instance, the figure below shows that the missingness variable \(R_Y\) (RY) depends on both \(X\) and \(Y\). This would still classify as MNAR.
+
+```{r echo=FALSE}
+set.seed(1)
+d9 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 1, name = "UX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 0.7, name = "RX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 1.475, yend = 0.7)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0, name = "UY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0.3, name = "RY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 1.475, yend = 0.3)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 1.5, yend = 0.325)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+```
+
+Now, let's generate data with measured variables where each also depends on its missingness variable \(R\). We use the same variables, functions, and errors but introduce different versions of missingness, ranging from smaller to larger proportions of missing values.
+
+```{r}
+I <- seq(10)
+RX_p <- seq(0, 0.95, length = length(I))
+RX_p <- mapply(c, 1 - RX_p, RX_p)
+RY_p <- seq(0, 0.95, length = length(I))
+RY_p <- mapply(c, 1 - RY_p, RY_p)
+
+d9_results <- list()
+
+for(i in I){
+  d9_functions <- function_from_edge(d9)
+  
+  function_X <- function(n){
+    X <- rnorm(n, mean = 0, sd = 1)
+    return(X)
+  }
+  
+  function_UX <- function(n){
+    UX <- rnorm(n, mean = 0, sd = 0.01)
+    return(UX)
+  }
+  
+  function_RX <- function(n){
+    RX <- sample(c(0, 1), size = n, replace = TRUE, prob = RX_p[, i])
+    return(RX)
+  }
+  
+  function_Xm <- function(X, UX, RX){
+    Xm <- ifelse(RX == 1, NA, X + UX)
+    return(Xm)
+  }
+  
+  function_Y <- function(X){
+    Y <- 0.5 * X + rnorm(length(X), mean = 0.1, sd = 0.005)
+    return(Y)
+  }
+  
+  function_UY <- function(n){
+    UY <- rnorm(n, mean = 0, sd = 0.01)
+    return(UY)
+  }
+  
+  function_RY <- function(n){
+    RY <- sample(c(0, 1), size = n, replace = TRUE, prob = RY_p[, i])
+    return(RY)
+  }
+  
+  function_Ym <- function(Y, UY, RY){
+    Ym <- ifelse(RY == 1, NA, Y + UY)
+    return(Ym)
+  }
+  
+  d9_functions <- define(d9_functions, which = "X", what = function_X)
+  d9_functions <- define(d9_functions, which = "UX", what = function_UX)
+  d9_functions <- define(d9_functions, which = "RX", what = function_RX)
+  d9_functions <- define(d9_functions, which = "Xm", what = function_Xm)
+  d9_functions <- define(d9_functions, which = "Y", what = function_Y)
+  d9_functions <- define(d9_functions, which = "UY", what = function_UY)
+  d9_functions <- define(d9_functions, which = "RY", what = function_RY)
+  d9_functions <- define(d9_functions, which = "Ym", what = function_Ym)
+  
+  set.seed(1)
+  d9_data <- data_from_function(d9_functions, n = 25000)
+  d9_reg <- lm(Ym ~ Xm, data = d9_data)
+  d9_results[[i]] <- tidy(d9_reg)
+}
+```
+
+```{r echo=FALSE}
+d9_results_rbind <- d9_results %>%
+  do.call(rbind,.) %>%
+  group_by(term) %>%
+  mutate(i = seq(n())) %>%
+  ungroup() %>%
+  left_join(
+    data.frame(term = "(Intercept)", i = I, p = RY_p[2,]) %>%
+      rbind(
+        data.frame(term = "Xm", i = I, p = RX_p[2,])
+      ),
+    by = join_by(term, i)
+  ) %>%
+  mutate(lb = estimate - qnorm(0.975) * std.error) %>%
+  mutate(ub = estimate + qnorm(0.975) * std.error)
+
+d9_plot <- list()
+
+d9_plot[[1]] <- d9_results_rbind %>%
+  ggplot(aes(p, estimate)) +
+  geom_hline(aes(yintercept = ifelse(term == "Xm", 0.5, 0.1)), lty = 2) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ term, scales = "free")
+
+d9_plot[[2]] <- d9_results_rbind %>%
+  ggplot(aes(p, p.value)) +
+  geom_hline(yintercept = 0.05, lty = 2) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ term, scales = "free")
+
+ggarrange(
+  d9_plot[[1]],
+  d9_plot[[2]],
+  ncol = 1,
+  nrow = 2
+)
+```
+
+We observe that higher proportions of missing values shift the estimated coefficients away from the true values. A missing proportion \(p\) of approximately 0.50 or more results in a substantially incorrect estimate for the effect of \(X\) on \(Y\), although the results remain statistically significant in cases of MCAR without missing value imputation.
 
 ## Bidirectional Causation
 
 Two variables may affect each other.
+
+## Time-Dependent Causation
+
+The effect of a variable on another is significant only after a particular time difference between both variables.

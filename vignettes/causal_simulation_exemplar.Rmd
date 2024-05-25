@@ -391,7 +391,7 @@ path3_data %>%
   kable_classic()
 ```
 
-A regression examines the correlation between \(X\) and \(Y\).
+A regression examines the correlation between \(X\) and \(Y\). 
 
 ```{r}
 path3_reg <- lm(Y ~ X, data = path3_data)

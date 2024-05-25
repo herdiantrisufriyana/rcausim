@@ -35,7 +35,7 @@ g_coord %>%
   kable() %>%
   kable_classic()
 
-## -----------------------------------------------------------------------------
+## ----fig.height=3.5, fig.width=7----------------------------------------------
 # Define the plot area
 g_plot <- ggplot(g_coord, aes(x, y, xend = xend, yend = yend))
 
@@ -55,10 +55,10 @@ g_plot <- g_plot + theme_void()
 # Display the graph
 print(g_plot)
 
-## ----echo=FALSE---------------------------------------------------------------
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
 print(g_plot)
 
-## ----echo=FALSE---------------------------------------------------------------
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
 g_coord %>%
   ggplot(aes(x, y, xend = xend, yend = yend)) +
   geom_nodelabel(aes(label = name)) +
@@ -66,10 +66,10 @@ g_coord %>%
   scale_y_reverse() +
   theme_void()
 
-## ----echo=FALSE---------------------------------------------------------------
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
 print(g_plot)
 
-## ----echo=FALSE---------------------------------------------------------------
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
 set.seed(1)
 data.frame(from = "X", to = "M") %>%
   add_row(data.frame(from = "M", to = "Y")) %>%
@@ -82,7 +82,7 @@ data.frame(from = "X", to = "M") %>%
   scale_y_reverse() +
   theme_void()
 
-## ----echo=FALSE---------------------------------------------------------------
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
 set.seed(1)
 data.frame(from = "C", to = "X") %>%
   add_row(data.frame(from = "C", to = "Y")) %>%
@@ -93,7 +93,7 @@ data.frame(from = "C", to = "X") %>%
   geom_nodelabel(aes(label = name)) +
   theme_void()
 
-## ----echo=FALSE---------------------------------------------------------------
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
 set.seed(1)
 data.frame(from = "X", to = "K") %>%
   add_row(data.frame(from = "Y", to = "K")) %>%
@@ -373,10 +373,10 @@ d234_g_plots <-
   d234_g_plots %>%
   lapply(\(x) x + theme_void())
 
-## ----echo=FALSE---------------------------------------------------------------
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
 ggarrange(
-  d234_g_plots[[4]]
-  ,d234_g_plots[[1]]
+  d234_g_plots[[4]],
+  d234_g_plots[[1]]
 )
 
 ## -----------------------------------------------------------------------------
@@ -430,10 +430,10 @@ rbind(
   kable() %>%
   kable_classic()
 
-## ----echo=FALSE---------------------------------------------------------------
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
 ggarrange(
-  d234_g_plots[[2]]
-  ,d234_g_plots[[5]]
+  d234_g_plots[[2]],
+  d234_g_plots[[5]]
 )
 
 ## -----------------------------------------------------------------------------
@@ -487,10 +487,10 @@ rbind(
   kable() %>%
   kable_classic()
 
-## ----echo=FALSE---------------------------------------------------------------
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
 ggarrange(
-  d234_g_plots[[3]]
-  ,d234_g_plots[[6]]
+  d234_g_plots[[3]],
+  d234_g_plots[[6]]
 )
 
 ## -----------------------------------------------------------------------------
@@ -548,7 +548,7 @@ rbind(
 d5 <- data.frame(from = "X1", to = "Y")
 d5 <- add_row(d5, data.frame(from = "X2", to = "Y"))
 
-## ----echo=FALSE---------------------------------------------------------------
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
 set.seed(1)
 d5 %>%
   graph_from_data_frame() %>%
@@ -666,4 +666,394 @@ d7_results %>%
 d7_test %>%
   kable() %>%
   kable_classic()
+
+## -----------------------------------------------------------------------------
+d8 <- data.frame(from = "X", to = "Y")
+d8 <- add_row(d8, data.frame(from = "X", to = "Xm"))
+d8 <- add_row(d8, data.frame(from = "UX", to = "Xm"))
+d8 <- add_row(d8, data.frame(from = "Y", to = "Ym"))
+d8 <- add_row(d8, data.frame(from = "UY", to = "Ym"))
+
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
+set.seed(1)
+d8 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
+d8_nondif <- list()
+
+set.seed(1)
+d8_nondif[[1]] <- d8 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 1, name = "UX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0, name = "UY", xend = 1.025, yend = 0)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+set.seed(1)
+d8_nondif[[2]] <- d8 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0.5, name = "UXY", xend = 1, yend = 0.975)) %>%
+  add_row(data.frame(x = 1, y = 0.5, name = "UXY", xend = 1, yend = 0.025)) %>%
+  add_row(data.frame(x = 1, y = 0.5, name = "UXY", xend = 1, yend = 0.5)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+ggarrange(
+  d8_nondif[[1]],
+  d8_nondif[[2]]
+)
+
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
+d8_ind_dif <- list()
+
+set.seed(1)
+d8_ind_dif[[1]] <- d8 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 1, name = "UX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0, name = "UY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 1.5, yend = 0.025)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+set.seed(1)
+d8_ind_dif[[2]] <- d8 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 1, name = "UX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0, name = "UY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 1.5, yend = 0.975)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+ggarrange(
+  d8_ind_dif[[1]],
+  d8_ind_dif[[2]]
+)
+
+## -----------------------------------------------------------------------------
+I <- seq(10)
+UX_epsilon <- seq(0.005, 4, length = length(I))
+UY_epsilon <- seq(0.005, 8, length = length(I))
+
+d8_results <- list()
+
+for(i in I){
+  d8_functions <- function_from_edge(d8)
+  
+  function_X <- function(n){
+    X <- rnorm(n, mean = 0, sd = 1)
+    return(X)
+  }
+  
+  function_UX <- function(n){
+    UX <- rnorm(n, mean = 0, sd = UX_epsilon[[i]])
+    return(UX)
+  }
+  
+  function_Xm <- function(X, UX){
+    Xm <- X + UX
+    return(Xm)
+  }
+  
+  function_Y <- function(X){
+    Y <- 0.5 * X + rnorm(length(X), mean = 0.1, sd = 0.005)
+    return(Y)
+  }
+  
+  function_UY <- function(n){
+    UY <- rnorm(n, mean = 0, sd = UY_epsilon[[i]])
+    return(UY)
+  }
+  
+  function_Ym <- function(Y, UY){
+    Ym <- Y + UY
+    return(Ym)
+  }
+  
+  d8_functions <- define(d8_functions, which = "X", what = function_X)
+  d8_functions <- define(d8_functions, which = "UX", what = function_UX)
+  d8_functions <- define(d8_functions, which = "Xm", what = function_Xm)
+  d8_functions <- define(d8_functions, which = "Y", what = function_Y)
+  d8_functions <- define(d8_functions, which = "UY", what = function_UY)
+  d8_functions <- define(d8_functions, which = "Ym", what = function_Ym)
+  
+  set.seed(1)
+  d8_data <- data_from_function(d8_functions, n = 25000)
+  d8_reg <- lm(Ym ~ Xm, data = d8_data)
+  d8_results[[i]] <- tidy(d8_reg)
+}
+
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
+d8_results_rbind <- d8_results %>%
+  do.call(rbind,.) %>%
+  group_by(term) %>%
+  mutate(i = seq(n())) %>%
+  ungroup() %>%
+  left_join(
+    data.frame(term = "(Intercept)", i = I, epsilon = UY_epsilon) %>%
+      rbind(
+        data.frame(term = "Xm", i = I, epsilon = UX_epsilon)
+      ),
+    by = join_by(term, i)
+  ) %>%
+  mutate(lb = estimate - qnorm(0.975) * std.error) %>%
+  mutate(ub = estimate + qnorm(0.975) * std.error)
+
+d8_plot <- list()
+
+d8_plot[[1]] <- d8_results_rbind %>%
+  ggplot(aes(epsilon, estimate)) +
+  geom_hline(aes(yintercept = ifelse(term == "Xm", 0.5, 0.1)), lty = 2) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ term, scales = "free")
+
+d8_plot[[2]] <- d8_results_rbind %>%
+  ggplot(aes(epsilon, p.value)) +
+  geom_hline(yintercept = 0.05, lty = 2) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ term, scales = "free")
+
+ggarrange(
+  d8_plot[[1]],
+  d8_plot[[2]],
+  ncol = 1,
+  nrow = 2
+)
+
+## -----------------------------------------------------------------------------
+d9 <- data.frame(from = "X", to = "Y")
+d9 <- add_row(d9, data.frame(from = "X", to = "Xm"))
+d9 <- add_row(d9, data.frame(from = "UX", to = "Xm"))
+d9 <- add_row(d9, data.frame(from = "RX", to = "Xm"))
+d9 <- add_row(d9, data.frame(from = "Y", to = "Ym"))
+d9 <- add_row(d9, data.frame(from = "UY", to = "Ym"))
+d9 <- add_row(d9, data.frame(from = "RY", to = "Ym"))
+
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
+set.seed(1)
+d9 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 1, name = "UX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 0.7, name = "RX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0, name = "UY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0.3, name = "RY", xend = 1.025, yend = 0)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
+set.seed(1)
+d9 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 1, name = "UX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 0.7, name = "RX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 1.5, yend = 0.675)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0, name = "UY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0.3, name = "RY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 1.5, yend = 0.325)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
+set.seed(1)
+d9 %>%
+  filter(from %in% c("X","Y") & to %in% c("X","Y")) %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X'", xend = 1, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 1, name = "UX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 1.5, y = 0.7, name = "RX", xend = 1.025, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 1.475, yend = 0.7)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y'", xend = 1, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0, name = "UY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 1.5, y = 0.3, name = "RY", xend = 1.025, yend = 0)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 1.475, yend = 0.3)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 1.5, yend = 0.325)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+## -----------------------------------------------------------------------------
+I <- seq(10)
+RX_p <- seq(0, 0.95, length = length(I))
+RX_p <- mapply(c, 1 - RX_p, RX_p)
+RY_p <- seq(0, 0.95, length = length(I))
+RY_p <- mapply(c, 1 - RY_p, RY_p)
+
+d9_results <- list()
+
+for(i in I){
+  d9_functions <- function_from_edge(d9)
+  
+  function_X <- function(n){
+    X <- rnorm(n, mean = 0, sd = 1)
+    return(X)
+  }
+  
+  function_UX <- function(n){
+    UX <- rnorm(n, mean = 0, sd = 0.01)
+    return(UX)
+  }
+  
+  function_RX <- function(n){
+    RX <- sample(c(0, 1), size = n, replace = TRUE, prob = RX_p[, i])
+    return(RX)
+  }
+  
+  function_Xm <- function(X, UX, RX){
+    Xm <- ifelse(RX == 1, NA, X + UX)
+    return(Xm)
+  }
+  
+  function_Y <- function(X){
+    Y <- 0.5 * X + rnorm(length(X), mean = 0.1, sd = 0.005)
+    return(Y)
+  }
+  
+  function_UY <- function(n){
+    UY <- rnorm(n, mean = 0, sd = 0.01)
+    return(UY)
+  }
+  
+  function_RY <- function(n){
+    RY <- sample(c(0, 1), size = n, replace = TRUE, prob = RY_p[, i])
+    return(RY)
+  }
+  
+  function_Ym <- function(Y, UY, RY){
+    Ym <- ifelse(RY == 1, NA, Y + UY)
+    return(Ym)
+  }
+  
+  d9_functions <- define(d9_functions, which = "X", what = function_X)
+  d9_functions <- define(d9_functions, which = "UX", what = function_UX)
+  d9_functions <- define(d9_functions, which = "RX", what = function_RX)
+  d9_functions <- define(d9_functions, which = "Xm", what = function_Xm)
+  d9_functions <- define(d9_functions, which = "Y", what = function_Y)
+  d9_functions <- define(d9_functions, which = "UY", what = function_UY)
+  d9_functions <- define(d9_functions, which = "RY", what = function_RY)
+  d9_functions <- define(d9_functions, which = "Ym", what = function_Ym)
+  
+  set.seed(1)
+  d9_data <- data_from_function(d9_functions, n = 25000)
+  d9_reg <- lm(Ym ~ Xm, data = d9_data)
+  d9_results[[i]] <- tidy(d9_reg)
+}
+
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
+d9_results_rbind <- d9_results %>%
+  do.call(rbind,.) %>%
+  group_by(term) %>%
+  mutate(i = seq(n())) %>%
+  ungroup() %>%
+  left_join(
+    data.frame(term = "(Intercept)", i = I, p = RY_p[2,]) %>%
+      rbind(
+        data.frame(term = "Xm", i = I, p = RX_p[2,])
+      ),
+    by = join_by(term, i)
+  ) %>%
+  mutate(lb = estimate - qnorm(0.975) * std.error) %>%
+  mutate(ub = estimate + qnorm(0.975) * std.error)
+
+d9_plot <- list()
+
+d9_plot[[1]] <- d9_results_rbind %>%
+  ggplot(aes(p, estimate)) +
+  geom_hline(aes(yintercept = ifelse(term == "Xm", 0.5, 0.1)), lty = 2) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ term, scales = "free")
+
+d9_plot[[2]] <- d9_results_rbind %>%
+  ggplot(aes(p, p.value)) +
+  geom_hline(yintercept = 0.05, lty = 2) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ term, scales = "free")
+
+ggarrange(
+  d9_plot[[1]],
+  d9_plot[[2]],
+  ncol = 1,
+  nrow = 2
+)
 

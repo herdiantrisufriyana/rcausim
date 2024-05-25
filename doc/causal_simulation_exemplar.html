@@ -614,9 +614,9 @@ directed graph.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Convert the data frame into an igraph object.</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph_from_data_frame</span>(d, <span class="at">directed =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">print</span>(g)</span></code></pre></div>
-<pre><code>## IGRAPH 0d3a80d DN-- 2 1 -- 
+<pre><code>## IGRAPH d223390 DN-- 2 1 -- 
 ## + attr: name (v/c)
-## + edge from 0d3a80d (vertex names):
+## + edge from d223390 (vertex names):
 ## [1] X-&gt;Y</code></pre>
 <p>To visualize the graph, we need to automatically determine the
 coordinates to plot <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> and draw a line from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>.</p>
@@ -2564,9 +2564,23 @@ pair of other variables in a causal graph.</p>
 </div>
 <div id="causal-effect-estimation" class="section level1">
 <h1>Causal Effect Estimation</h1>
+<p>In the previous section, we used different causal structures but
+similar functions to generate the data, specifically using linear
+functions. If the linear regression model is correctly specified, then
+the estimated coefficients should reflect the data generation process.
+However, what if we use non-linear functions to generate the data? Can
+the linear regression model, especially one that strictly involves
+additive terms, still accurately estimate the causal effect when
+properly specified?</p>
+<div id="causal-path-with-a-logical-and-rule" class="section level2">
+<h2>Causal path with a logical “AND” rule</h2>
+<p>Below we create a data frame <code>d5</code> which has a simple
+causal structure, i.e., two causal paths from either <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span> to <span class="math inline">\(Y\)</span>.</p>
 <div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" tabindex="-1"></a>d5 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">from =</span> <span class="st">&quot;X1&quot;</span>, <span class="at">to =</span> <span class="st">&quot;Y&quot;</span>)</span>
 <span id="cb59-2"><a href="#cb59-2" tabindex="-1"></a>d5 <span class="ot">&lt;-</span> <span class="fu">add_row</span>(d5, <span class="fu">data.frame</span>(<span class="at">from =</span> <span class="st">&quot;X2&quot;</span>, <span class="at">to =</span> <span class="st">&quot;Y&quot;</span>))</span></code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>We also define a class of <code>Functions</code> to clarify the
+arguments required for each function.</p>
 <div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" tabindex="-1"></a>d5_functions <span class="ot">&lt;-</span> <span class="fu">function_from_edge</span>(d5)</span>
 <span id="cb60-2"><a href="#cb60-2" tabindex="-1"></a><span class="fu">print</span>(d5_functions)</span></code></pre></div>
 <pre><code>## 0 / 3  vertices have functions.
@@ -2574,6 +2588,22 @@ pair of other variables in a causal graph.</p>
 ## X1 = function(n)
 ## X2 = function(n)
 ## Y = function(X1,X2)</code></pre>
+<p>For both <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span>, we determine their functions to
+generate data of 0 or 1 with the length <code>n</code>. Meanwhile, <span class="math inline">\(Y\)</span> is determine by its function to apply a
+logical “AND” rule: if <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span> are both equal to 1, then <span class="math inline">\(Y\)</span> is equal to 1; otherwise, it is 0.</p>
+<p>Interpreting the correctness of the estimated coefficient is not as
+intuitive as when using a linear function. Nonetheless, the logical
+“AND” rule for generating the data can be represented by the linear
+function:</p>
+<p><span class="math display">\[Y = -0.25 + 0.5 \times X1 + 0.5 \times
+X2\]</span></p>
+<ol style="list-style-type: decimal">
+<li>If both <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span> are equal to 0, then <span class="math inline">\(Y\)</span> equals -0.25, rounded to 0;</li>
+<li>If only one of <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span> equals 1, then <span class="math inline">\(Y\)</span> equals 0.25, rounded to 0; and</li>
+<li>If both <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span> equal 1, then <span class="math inline">\(Y\)</span> equals 0.75, rounded to 1.</li>
+</ol>
+<p>We conduct a regression using the generated data to estimate the
+effects of either <span class="math inline">\(X1\)</span> or <span class="math inline">\(X2\)</span> on <span class="math inline">\(Y\)</span>.</p>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" tabindex="-1"></a>function_X1 <span class="ot">&lt;-</span> <span class="cf">function</span>(n){</span>
 <span id="cb62-2"><a href="#cb62-2" tabindex="-1"></a>  X1 <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), n, <span class="at">replace =</span> T)</span>
 <span id="cb62-3"><a href="#cb62-3" tabindex="-1"></a>  <span class="fu">return</span>(X1)</span>
@@ -2671,6 +2701,13 @@ X2
 </tr>
 </tbody>
 </table>
+<p>The results accurately show the estimated coefficients for <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span>. The interpretation is even more
+intuitive in this special case if we simply compute <span class="math inline">\(\hat{Y}\)</span> (Y_hat) to predict <span class="math inline">\(Y\)</span>, where <span class="math inline">\(Y =
+\hat{Y} + \epsilon\)</span>; thus, <span class="math inline">\(\epsilon\)</span> is the error of the model in
+predicting <span class="math inline">\(Y\)</span>.</p>
+<p>We create test data which simply includes all the possible
+combinations of <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span>. Then, we compute <span class="math inline">\(\hat{Y}\)</span> using the test data and the
+regression model fitted to the generated data.</p>
 <div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">X1 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">X2 =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
 <span id="cb63-2"><a href="#cb63-2" tabindex="-1"></a>d5_test <span class="ot">&lt;-</span> <span class="fu">mutate</span>(test_data, <span class="at">Y =</span> <span class="fu">mapply</span>(function_Y, X1, X2))</span>
 <span id="cb63-3"><a href="#cb63-3" tabindex="-1"></a>d5_test <span class="ot">&lt;-</span> <span class="fu">mutate</span>(d5_test, <span class="at">Y_hat =</span> <span class="fu">predict</span>(d5_reg, <span class="at">newdata =</span> d5_test))</span>
@@ -2751,6 +2788,14 @@ Y_hat
 </tr>
 </tbody>
 </table>
+<p>As observed, even when using a logical “AND” rule to generate the
+data, a linear regression model can still accurately estimate the causal
+effect if the model is correctly specified.</p>
+</div>
+<div id="causal-path-with-a-logical-or-rule" class="section level2">
+<h2>Causal path with a logical “OR” rule</h2>
+<p>Now, we apply the same approach but using a logical “OR” rule. If
+either <span class="math inline">\(X1\)</span> or <span class="math inline">\(X2\)</span> equals 1, then <span class="math inline">\(Y\)</span> is set to 1.</p>
 <div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" tabindex="-1"></a>d6_functions <span class="ot">&lt;-</span> <span class="fu">function_from_edge</span>(d5)</span>
 <span id="cb64-2"><a href="#cb64-2" tabindex="-1"></a></span>
 <span id="cb64-3"><a href="#cb64-3" tabindex="-1"></a>function_Y <span class="ot">&lt;-</span> <span class="cf">function</span>(X1, X2){</span>
@@ -2844,6 +2889,15 @@ X2
 </tr>
 </tbody>
 </table>
+<p>As previously described, we can also represent the logical “OR” rule
+with the linear function:</p>
+<p><span class="math display">\[Y = 0.25 + 0.5 \times X1 + 0.5 \times
+X2\]</span></p>
+<ol style="list-style-type: decimal">
+<li>If both <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span> are equal to 0, then <span class="math inline">\(Y\)</span> equals 0.25, rounded to 0;</li>
+<li>If only one of <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span> equals 1, then <span class="math inline">\(Y\)</span> equals 0.75, rounded to 1; and</li>
+<li>If both <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span> equal 1, then <span class="math inline">\(Y\)</span> equals 1.25, rounded to 1.</li>
+</ol>
 <table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2920,6 +2974,19 @@ Y_hat
 </tr>
 </tbody>
 </table>
+<p>As observed, when using a logical “OR” rule to generate the data, a
+linear regression model can also accurately estimate the causal effect
+if the model is correctly specified.</p>
+<p>Are there other non-linear functions that cannot be estimated by a
+regression model, especially one that strictly involves additive
+terms?</p>
+</div>
+<div id="causal-path-with-a-logical-xor-rule" class="section level2">
+<h2>Causal path with a logical “XOR” rule</h2>
+<p>Yes. A logical “XOR” rule is one of many data-generation processes
+that cannot be accurately estimated by such a regression model. This
+rule dictates that <span class="math inline">\(Y\)</span> is set to 1,
+only if both <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span> are either 0 or 1 but not both.</p>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" tabindex="-1"></a>d7_functions <span class="ot">&lt;-</span> <span class="fu">function_from_edge</span>(d5)</span>
 <span id="cb65-2"><a href="#cb65-2" tabindex="-1"></a></span>
 <span id="cb65-3"><a href="#cb65-3" tabindex="-1"></a>function_Y <span class="ot">&lt;-</span> <span class="cf">function</span>(X1, X2){</span>
@@ -3013,6 +3080,16 @@ X2
 </tr>
 </tbody>
 </table>
+<p>Using the estimated coefficients of the regression model, we can
+formulate the linear function:</p>
+<p><span class="math display">\[Y = 0.5 + 0 \times X1 + 0 \times
+X2\]</span></p>
+<p>However, this function cannot represent a logical “XOR” rule:</p>
+<ol style="list-style-type: decimal">
+<li>If both <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span> are equal to 0, then <span class="math inline">\(Y\)</span> equals 0.5, which is rounded to 1;</li>
+<li>If only one of <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span> equals 1, then <span class="math inline">\(Y\)</span> remains 0.5, also rounded to 1;</li>
+<li>If both <span class="math inline">\(X1\)</span> and <span class="math inline">\(X2\)</span> equal 1, then <span class="math inline">\(Y\)</span> again equals 0.5, rounded to 1.</li>
+</ol>
 <table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -3089,6 +3166,11 @@ Y_hat
 </tr>
 </tbody>
 </table>
+<p>Therefore, a linear regression model cannot accurately estimate the
+causal effect when the data-generation process involves non-linear
+functions similar to a logical “XOR” rule, even if the model is
+correctly specified.</p>
+</div>
 </div>
 <div id="miscellanous" class="section level1">
 <h1>Miscellanous</h1>

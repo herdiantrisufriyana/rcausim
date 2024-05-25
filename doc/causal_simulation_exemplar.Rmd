@@ -782,6 +782,12 @@ Now, we can observe why including \(K\) in \(Z\) is problematic. In the first ve
 
 # Causal Effect Estimation
 
+In the previous section, we used different causal structures but similar functions to generate the data, specifically using linear functions. If the linear regression model is correctly specified, then the estimated coefficients should reflect the data generation process. However, what if we use non-linear functions to generate the data? Can the linear regression model, especially one that strictly involves additive terms, still accurately estimate the causal effect when properly specified?
+
+## Causal path with a logical "AND" rule
+
+Below we create a data frame `d5` which has a simple causal structure, i.e., two causal paths from either \(X1\) and \(X2\) to \(Y\).
+
 ```{r}
 d5 <- data.frame(from = "X1", to = "Y")
 d5 <- add_row(d5, data.frame(from = "X2", to = "Y"))
@@ -800,10 +806,24 @@ d5 %>%
   theme_void()
 ```
 
+We also define a class of `Functions` to clarify the arguments required for each function.
+
 ```{r}
 d5_functions <- function_from_edge(d5)
 print(d5_functions)
 ```
+
+For both \(X1\) and \(X2\), we determine their functions to generate data of 0 or 1 with the length `n`. Meanwhile, \(Y\) is determine by its function to apply a logical "AND" rule: if \(X1\) and \(X2\) are both equal to 1, then \(Y\) is equal to 1; otherwise, it is 0.
+
+Interpreting the correctness of the estimated coefficient is not as intuitive as when using a linear function. Nonetheless, the logical "AND" rule for generating the data can be represented by the linear function:
+
+\[Y = -0.25 + 0.5 \times X1 + 0.5 \times X2\]
+
+1. If both \(X1\) and \(X2\) are equal to 0, then \(Y\) equals -0.25, rounded to 0;
+2. If only one of \(X1\) and \(X2\) equals 1, then \(Y\) equals 0.25, rounded to 0; and
+3. If both \(X1\) and \(X2\) equal 1, then \(Y\) equals 0.75, rounded to 1.
+
+We conduct a regression using the generated data to estimate the effects of either \(X1\) or \(X2\) on \(Y\).
 
 ```{r}
 function_X1 <- function(n){
@@ -837,6 +857,10 @@ d5_results %>%
   kable_classic()
 ```
 
+The results accurately show the estimated coefficients for \(X1\) and \(X2\). The interpretation is even more intuitive in this special case if we simply compute \(\hat{Y}\) (Y_hat) to predict \(Y\), where \(Y = \hat{Y} + \epsilon\); thus, \(\epsilon\) is the error of the model in predicting \(Y\).
+
+We create test data which simply includes all the possible combinations of \(X1\) and \(X2\). Then, we compute \(\hat{Y}\) using the test data and the regression model fitted to the generated data.
+
 ```{r}
 test_data <- expand.grid(X1 = c(0, 1), X2 = c(0, 1))
 d5_test <- mutate(test_data, Y = mapply(function_Y, X1, X2))
@@ -849,6 +873,12 @@ d5_test %>%
   kable() %>%
   kable_classic()
 ```
+
+As observed, even when using a logical “AND” rule to generate the data, a linear regression model can still accurately estimate the causal effect if the model is correctly specified.
+
+## Causal path with a logical "OR" rule
+
+Now, we apply the same approach but using a logical "OR" rule. If either \(X1\) or \(X2\) equals 1, then \(Y\) is set to 1.
 
 ```{r}
 d6_functions <- function_from_edge(d5)
@@ -878,11 +908,27 @@ d6_results %>%
   kable_classic()
 ```
 
+As previously described, we can also represent the logical "OR" rule with the linear function:
+
+\[Y = 0.25 + 0.5 \times X1 + 0.5 \times X2\]
+
+1. If both \(X1\) and \(X2\) are equal to 0, then \(Y\) equals 0.25, rounded to 0;
+2. If only one of \(X1\) and \(X2\) equals 1, then \(Y\) equals 0.75, rounded to 1; and
+3. If both \(X1\) and \(X2\) equal 1, then \(Y\) equals 1.25, rounded to 1.
+
 ```{r echo=FALSE}
 d6_test %>%
   kable() %>%
   kable_classic()
 ```
+
+As observed, when using a logical “OR” rule to generate the data, a linear regression model can also accurately estimate the causal effect if the model is correctly specified.
+
+Are there other non-linear functions that cannot be estimated by a regression model, especially one that strictly involves additive terms?
+
+## Causal path with a logical "XOR" rule
+
+Yes. A logical "XOR" rule is one of many data-generation processes that cannot be accurately estimated by such a regression model. This rule dictates that \(Y\) is set to 1, only if both \(X1\) and \(X2\) are either 0 or 1 but not both.
 
 ```{r}
 d7_functions <- function_from_edge(d5)
@@ -912,11 +958,23 @@ d7_results %>%
   kable_classic()
 ```
 
+Using the estimated coefficients of the regression model, we can formulate the linear function:
+
+\[Y = 0.5 + 0 \times X1 + 0 \times X2\]
+
+However, this function cannot represent a logical "XOR" rule:
+
+1. If both \(X1\) and \(X2\) are equal to 0, then \(Y\) equals 0.5, which is rounded to 1;
+2. If only one of \(X1\) and \(X2\) equals 1, then \(Y\) remains 0.5, also rounded to 1;
+3. If both \(X1\) and \(X2\) equal 1, then \(Y\) again equals 0.5, rounded to 1.
+
 ```{r echo=FALSE}
 d7_test %>%
   kable() %>%
   kable_classic()
 ```
+
+Therefore, a linear regression model cannot accurately estimate the causal effect when the data-generation process involves non-linear functions similar to a logical “XOR” rule, even if the model is correctly specified.
 
 # Miscellanous
 

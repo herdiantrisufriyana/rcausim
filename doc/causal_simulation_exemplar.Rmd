@@ -1423,4 +1423,4 @@ Two variables may affect each other.
 
 ## Time-Dependent Causation
 
-The effect of a variable on another is significant only after a particular time difference between both variables.
+The effect of a variable on another is significant only after a particular time difference between both variables. 

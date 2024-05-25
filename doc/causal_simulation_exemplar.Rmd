@@ -25,7 +25,7 @@ library(kableExtra)
 library(ggpubr)
 ```
 
-We will use \(X\) and \(Y\) respectively to denote a cause and an effect. Both are represented as nodes in a graph. If there is a cause-and-effect relationship between both, then an edge is drawn from \(X\) to \(Y\). To do this, we need a 2-column data frame: (1) from, and (2) to.
+We will use \(X\) and \(Y\) respectively to denote a cause and an effect. Both are represented as vertices in a graph. If there is a cause-and-effect relationship between both, then an edge is drawn from \(X\) to \(Y\). To do this, we need a 2-column data frame: (1) from, and (2) to.
 
 ```{r}
 # Create a data frame for the X and Y relationship
@@ -38,7 +38,7 @@ d %>%
   kable_classic()
 ```
 
-We convert the data frame into an igraph object as a directed graph.
+We convert the data frame into an `igraph` object as a directed graph.
 
 ```{r}
 # Convert the data frame into an igraph object.
@@ -65,7 +65,7 @@ g_coord %>%
 
 To draw the graph, we utilize `ggplot` for its flexibility in customizing graph aesthetics. Use closed and curved arrows to clearly indicate the direction of the causal effect and helps prevent overlapping of arrows.
 
-We may need to make the tree layout horizontal tree. This orientation helps in visualizing the causal flow from left to right, making it easier to follow.
+We may need to make the tree layout horizontal. This orientation helps in visualizing the causal flow from left to right, making it easier to follow.
 
 ```{r}
 # Define the plot area
@@ -90,7 +90,7 @@ print(g_plot)
 
 ## Vertex and edge
 
-A variable is represented as a vertex, and a path is represented as an edge(s). Two variables may have a path between them. It means \(X\) and \(Y\) are dependent.
+A variable is represented as a vertex, and a path is represented as 1 or more edges. Two variables may have a path between them. It means \(X\) and \(Y\) are dependent.
 
 ```{r echo=FALSE}
 print(g_plot)
@@ -109,13 +109,13 @@ g_coord %>%
 
 ## Path
 
-If two variables have a path between them, there are four possible paths. First, a path consists of one edge.
+If two variables have a path between them, there are four possible paths. First, a path consists of a single edge, which we call a ***causal path***.
 
 ```{r echo=FALSE}
 print(g_plot)
 ```
 
-Second, a path consists of more than one edges with mediator(s). A mediator is connected by two edges: one from \(X\) to \(M\) and another from \(M\) to \(Y\).
+Second, a path consists of more than one edges with 1 or more mediators, which we call a ***mediator path***. A mediator is connected by two edges: one from \(X\) to \(M\) and another from \(M\) to \(Y\).
 
 ```{r echo=FALSE}
 set.seed(1)
@@ -131,7 +131,7 @@ data.frame(from = "X", to = "M") %>%
   theme_void()
 ```
 
-Third, a path consists of more than one edges with confounder(s). A confounder is connected by two edges: one to \(X\) and another to \(Y\).
+Third, a path consists of more than one edges with 1 or more confounders, which is called a ***confounder path***. A confounder is connected by two edges: one to \(X\) and another to \(Y\). 
 
 ```{r echo=FALSE}
 set.seed(1)
@@ -145,7 +145,7 @@ data.frame(from = "C", to = "X") %>%
   theme_void()
 ```
 
-Fourth, a path consists of more than one edges with collider(s). A collider is connected by two edges coming from \(X\) and \(Y\) to \(K\).
+Fourth, a path consists of more than one edges with 1 or more colliders, i.e., a ***collider path***. A collider is connected by two edges coming from \(X\) and \(Y\) to \(K\).
 
 ```{r echo=FALSE}
 set.seed(1)
@@ -169,7 +169,7 @@ library(rcausim)
 library(broom)
 ```
 
-## The first and second paths allow both correlation and causation
+## Both causal and mediator paths allow both correlation and causation
 
 We start by defining a `Functions` class based on the specified causal structure in our previous data frame `d`. This class will help specify the required arguments for each variable's function.
 
@@ -234,7 +234,7 @@ path1_results %>%
 
 This output should show the estimated coefficients, their standard errors, \(z\)-values, and \(p\)-values. Results shows that \(X\) has a significant effect on \(Y\) (\(p\)-value <0.05). The estimated coefficients reflect the data generation process, providing a consistency check for our simulation.
 
-For the second path involving a mediator \(M\), we create a new data frame `d2`. This data frame specifies the causal paths from \(X\) to \(M\) and then from \(M\) to \(Y\).
+For the mediator path involving a mediator \(M\), we create a new data frame `d2`. This data frame specifies the edges from \(X\) to \(M\) and then from \(M\) to \(Y\).
 
 ```{r}
 d2 <- data.frame(from = "X", to = "M")
@@ -247,7 +247,7 @@ d2 %>%
   kable_classic()
 ```
 
-A new class of `Functions` is defined using `d2` to establish the second path which involves a mediator. This step helps clarify the arguments in each function of \(X\), \(M\), and \(Y\).
+A new class of `Functions` is defined using `d2` to establish a path which involves a mediator. This step helps clarify the arguments in each function of \(X\), \(M\), and \(Y\).
 
 ```{r}
 path2_functions <- function_from_edge(d2)
@@ -290,7 +290,7 @@ path2_functions <- define(path2_functions, which = 'Y', what = function_Y)
 print(path2_functions)
 ```
 
-With `path2_functions`, we generate data that represent the second path.
+With `path2_functions`, we generate data that represent the mediator path.
 
 ```{r}
 set.seed(1)
@@ -319,7 +319,7 @@ path2_results %>%
 
 In our data generation process, \(M\) is defined as \(0.7 \times X + 0.3\), and \(Y\) as \(0.5 \times M + 0.1\); therefore, \(Y(X)\) equals \(0.5 \times (0.7 \times X + 0.3) + 0.1\). Solving this equation, we find that the estimated coefficients reflect the data generation process.
 
-## The third path allows correlation although there is no causation
+## The confounder path allows correlation although there is no causation
 
 In the third path, both \(X\) and \(Y\) are influenced by \(C\), as shown in `d3` below.
 
@@ -406,7 +406,7 @@ path3_results %>%
 
 Results indicate a statistically significant correlation between \(X\) and \(Y\), although there is no edge directly from \(X\) to \(Y\). Notably, the coefficients are not identical to those used in the data generation process.
 
-## The fourth path allows neither correlation nor causation
+## The collider path allows neither correlation nor causation
 
 In this path, both \(X\) and \(Y\) both influence \(K\) but do not influence each other. This scenario is illustrated by `d4`.
 
@@ -495,7 +495,7 @@ Results shows no significant correlation between X and Y, although there is a pa
 
 # Causal Discovery
 
-Among the four paths, only the first and second paths represent causal relationships, while the others are non-causal. We can guess the causal structure based on these properties using directional (\(d\))-separation. It is a criterion used to determine whether a set of variables, \(Z\), provides conditional independence between the pair of other variables (i.e., \(X\) and \(Y\)) within a causal graph.
+Among the four paths, only causal and mediator paths represent causal relationships, while the others are non-causal. We can guess the causal structure based on these properties using directional (\(d\))-separation. It is a criterion used to determine whether a set of variables, \(Z\), provides conditional independence between the pair of other variables (i.e., \(X\) and \(Y\)) within a causal graph.
 
 Specifically, we need to identify if \(X\) and \(Y\) are dependent, then we condition them on \(Z\). If \(X\) and \(Y\) is conditionally independent, then there is no causal path between them. The rules of \(d\)-separation are:
 
@@ -504,7 +504,7 @@ Specifically, we need to identify if \(X\) and \(Y\) are dependent, then we cond
 
 Notably, when determining causal relationships, we include \(M\) in \(Z\) only if we aim to identify if there are any causal paths from \(X\) to \(Y\) that do not pass through \(M\).
 
-Now, we create additional versions of the second, third, and fourth paths, each including the first path. These versions, without and with the first path, represent scenarios in which the null hypothesis and the alternative hypothesis are respectively accepted.
+Now, we create additional versions of the mediator, confounder, and collider paths, each including the causal path. These versions, without and with a causal path, represent scenarios in which the null hypothesis and the alternative hypothesis are respectively accepted.
 
 ```{r}
 d2_with_d <- add_row(d2, d)
@@ -564,7 +564,7 @@ d234_g_plots <-
   lapply(\(x) x + theme_void())
 ```
 
-## The second path without and with the first path
+## The mediator path without and with a causal path
 
 Below we outline the data generation process in which the null hypothesis (left) and the alternative hypothesis (right) are accepted.
 
@@ -575,7 +575,7 @@ ggarrange(
 )
 ```
 
-A regression was already conducted for the second path without the first path, identified as `path2_results`. We need to apply the same analysis to the version with the first path.
+A regression was already conducted for the mediator path without a causal path, identified as `path2_results`. We need to apply the same analysis to the version with a causal path.
 
 ```{r}
 path2_d_functions <- function_from_edge(d2_with_d)
@@ -621,22 +621,22 @@ path2_cond_d_results <- tidy(path2_cond_d_reg)
 ```{r echo=FALSE}
 rbind(
   path2_results %>%
-    mutate(first_path = "No", conditioned = "No")
+    mutate(causal_path = "No", conditioned = "No")
   ,path2_cond_results %>%
-    mutate(first_path = "No", conditioned = "Yes")
+    mutate(causal_path = "No", conditioned = "Yes")
   ,path2_d_results %>%
-    mutate(first_path = "Yes", conditioned = "No")
+    mutate(causal_path = "Yes", conditioned = "No")
   ,path2_cond_d_results %>%
-    mutate(first_path = "Yes", conditioned = "Yes")
+    mutate(causal_path = "Yes", conditioned = "Yes")
 ) %>%
-  select(first_path, conditioned, everything()) %>%
+  select(causal_path, conditioned, everything()) %>%
   kable() %>%
   kable_classic()
 ```
 
 The regression results show that the coefficient of \(X\) is reduced from approximately 0.35 to nearly 0 when we condition on \(Z\) (which includes the mediator \(M\)) in the first version. When conditioning the second version on \(Z\), the coefficient of \(X\) is also reduced, from about 0.60 to 0.26; however, the effect of \(X\) on \(Y\) remains significant. This indicates that in the first scenario, conditioning on \(M\) successfully blocks the path from \(X\) to \(Y\), supporting the hypothesis of \(M\) being a complete mediator. In contrast, in the second scenario, \(M\) does not completely mediate the relationship between \(X\) and \(Y\), as \(X\) still has a direct effect on \(Y\).
 
-## The third path without and with the first path
+## The confounder path without and with a causal path
 
 We now apply the data generation process similarly, but in this instance, \(Z\) includes \(C\), as illustrated below.
 
@@ -693,24 +693,24 @@ path3_cond_d_results <- tidy(path3_cond_d_reg)
 ```{r echo=FALSE}
 rbind(
   path3_results %>%
-    mutate(first_path = "No", conditioned = "No")
+    mutate(causal_path = "No", conditioned = "No")
   ,path3_cond_results %>%
-    mutate(first_path = "No", conditioned = "Yes")
+    mutate(causal_path = "No", conditioned = "Yes")
   ,path3_d_results %>%
-    mutate(first_path = "Yes", conditioned = "No")
+    mutate(causal_path = "Yes", conditioned = "No")
   ,path3_cond_d_results %>%
-    mutate(first_path = "Yes", conditioned = "Yes")
+    mutate(causal_path = "Yes", conditioned = "Yes")
 ) %>%
-  select(first_path, conditioned, everything()) %>%
+  select(causal_path, conditioned, everything()) %>%
   kable() %>%
   kable_classic()
 ```
 
 For the first version, the coefficient of \(X\) is significantly reduced from approximately 0.7 to nearly 0 when we condition on \(Z\) (which includes the confounder \(C\)). In the second version, the coefficient is reduced from 0.96 to 0.24; however, \(X\) still exerts a significant effect on \(Y\).
 
-## The fourth path without and with the first path
+## The collider path without and with a causal path
 
-Unlike the second and third paths, the fourth path exhibits an opposite result when we condition the effect of \(X\) on \(Y\).
+Unlike the mediator and confounder paths, the collider path exhibits an opposite result when we condition the effect of \(X\) on \(Y\).
 
 ```{r echo=FALSE}
 ggarrange(
@@ -752,7 +752,7 @@ path4_d_reg <- lm(Y ~ X, data = path4_d_data)
 path4_d_results <- tidy(path4_d_reg)
 ```
 
-is also condition on \(Z\) which includes \(K\). Notably, this approach violates the rules of \(d\)-separation.
+The effect of \(X\) on \(Y\) is also conditioned on \(Z\) which includes \(K\). Notably, this approach violates the rules of \(d\)-separation.
 
 ```{r}
 path4_cond_reg <- lm(Y ~ X + K, data = path4_data)
@@ -765,15 +765,15 @@ path4_cond_d_results <- tidy(path4_cond_d_reg)
 ```{r echo=FALSE}
 rbind(
   path4_results %>%
-    mutate(first_path = "No", conditioned = "No")
+    mutate(causal_path = "No", conditioned = "No")
   ,path4_cond_results %>%
-    mutate(first_path = "No", conditioned = "Yes")
+    mutate(causal_path = "No", conditioned = "Yes")
   ,path4_d_results %>%
-    mutate(first_path = "Yes", conditioned = "No")
+    mutate(causal_path = "Yes", conditioned = "No")
   ,path4_cond_d_results %>%
-    mutate(first_path = "Yes", conditioned = "Yes")
+    mutate(causal_path = "Yes", conditioned = "Yes")
 ) %>%
-  select(first_path, conditioned, everything()) %>%
+  select(causal_path, conditioned, everything()) %>%
   kable() %>%
   kable_classic()
 ```

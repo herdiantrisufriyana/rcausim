@@ -418,15 +418,15 @@ path2_cond_d_results <- tidy(path2_cond_d_reg)
 ## ----echo=FALSE---------------------------------------------------------------
 rbind(
   path2_results %>%
-    mutate(first_path = "No", conditioned = "No")
+    mutate(causal_path = "No", conditioned = "No")
   ,path2_cond_results %>%
-    mutate(first_path = "No", conditioned = "Yes")
+    mutate(causal_path = "No", conditioned = "Yes")
   ,path2_d_results %>%
-    mutate(first_path = "Yes", conditioned = "No")
+    mutate(causal_path = "Yes", conditioned = "No")
   ,path2_cond_d_results %>%
-    mutate(first_path = "Yes", conditioned = "Yes")
+    mutate(causal_path = "Yes", conditioned = "Yes")
 ) %>%
-  select(first_path, conditioned, everything()) %>%
+  select(causal_path, conditioned, everything()) %>%
   kable() %>%
   kable_classic()
 
@@ -475,15 +475,15 @@ path3_cond_d_results <- tidy(path3_cond_d_reg)
 ## ----echo=FALSE---------------------------------------------------------------
 rbind(
   path3_results %>%
-    mutate(first_path = "No", conditioned = "No")
+    mutate(causal_path = "No", conditioned = "No")
   ,path3_cond_results %>%
-    mutate(first_path = "No", conditioned = "Yes")
+    mutate(causal_path = "No", conditioned = "Yes")
   ,path3_d_results %>%
-    mutate(first_path = "Yes", conditioned = "No")
+    mutate(causal_path = "Yes", conditioned = "No")
   ,path3_cond_d_results %>%
-    mutate(first_path = "Yes", conditioned = "Yes")
+    mutate(causal_path = "Yes", conditioned = "Yes")
 ) %>%
-  select(first_path, conditioned, everything()) %>%
+  select(causal_path, conditioned, everything()) %>%
   kable() %>%
   kable_classic()
 
@@ -532,15 +532,15 @@ path4_cond_d_results <- tidy(path4_cond_d_reg)
 ## ----echo=FALSE---------------------------------------------------------------
 rbind(
   path4_results %>%
-    mutate(first_path = "No", conditioned = "No")
+    mutate(causal_path = "No", conditioned = "No")
   ,path4_cond_results %>%
-    mutate(first_path = "No", conditioned = "Yes")
+    mutate(causal_path = "No", conditioned = "Yes")
   ,path4_d_results %>%
-    mutate(first_path = "Yes", conditioned = "No")
+    mutate(causal_path = "Yes", conditioned = "No")
   ,path4_cond_d_results %>%
-    mutate(first_path = "Yes", conditioned = "Yes")
+    mutate(causal_path = "Yes", conditioned = "Yes")
 ) %>%
-  select(first_path, conditioned, everything()) %>%
+  select(causal_path, conditioned, everything()) %>%
   kable() %>%
   kable_classic()
 

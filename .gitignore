@@ -51,6 +51,9 @@ rsconnect/
 # Ignore Rstudio project files
 *.Rproj
 
+# Ignore everything in archive
+archive/*
+
 # Ignore everything in renv
 renv/*
 

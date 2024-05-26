@@ -1416,11 +1416,3 @@ ggarrange(
 ```
 
 We observe that higher proportions of missing values shift the estimated coefficients away from the true values. A missing proportion \(p\) of approximately 0.50 or more results in a substantially incorrect estimate for the effect of \(X\) on \(Y\), although the results remain statistically significant in cases of MCAR without missing value imputation.
-
-## Bidirectional Causation
-
-Two variables may affect each other.
-
-## Time-Dependent Causation
-
-The effect of a variable on another is significant only after a particular time difference between both variables. 

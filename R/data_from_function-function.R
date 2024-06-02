@@ -114,7 +114,7 @@ data_from_function=function(func,n){
         ,'If a function includes the argument \'n\', it must be the only\n'
         ,'argument in that function. Please modify the functions for these\n'
         ,'vertices, accordingly:\n'
-        ,arg[is_arg_with_n] %>%
+        ,arg[!apply(arg[is_arg_with_n],\(x)length(x)==1)] %>%
           names() %>%
           paste0(collapse=', ')
       )

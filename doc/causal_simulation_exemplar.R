@@ -1057,3 +1057,186 @@ ggarrange(
   nrow = 2
 )
 
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
+data.frame(from = "X(t)", to = "Y(t)") %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X(t)", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y(t)", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X(t+1)", xend = 1, yend = 0.035)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y(t+1)", xend = 1, yend = 0)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+## -----------------------------------------------------------------------------
+d10 <- data.frame(from = "X", to = "Y")
+
+d10_functions <- function_from_edge(d10)
+
+function_X <- function(n){
+  X <- rnorm(n, mean = 0, sd = 1)
+  X <- abs(X)
+  return(X)
+}
+
+function_Y <- function(X){
+  Y <- 0.5 * X + rnorm(length(X), mean = 0.1, sd = 0.005)
+  return(Y)
+}
+
+d10_functions <- define(d10_functions, which = "X", what = function_X)
+d10_functions <- define(d10_functions, which = "Y", what = function_Y)
+
+d10_data <- data_from_function(d10_functions, n = 10000)
+
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
+set.seed(1)
+data.frame(from = "X", to = "Y") %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 0.025)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y", xend = 1, yend = 0)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+## -----------------------------------------------------------------------------
+d10 <- add_row(d10, data.frame(from = "Y", to = "Y"))
+
+function_Y <- function(X, Y){
+  Y <- 0.5 * X + 1.1 * Y
+  return(Y)
+}
+
+d10_functions <- define(d10_functions, which = "Y", what = function_Y)
+
+set.seed(1)
+d10_T_max <- rpois(nrow(d10_data), lambda = 25)
+d10_data <- time_varying(d10_functions, data = d10_data, T_max = d10_T_max)
+
+## ----echo=FALSE, fig.height=7, fig.width=7------------------------------------
+d10_plot <- list()
+
+set.seed(1); d10_plot[[1]] <- d10_data %>%
+  filter(i %in% sample(unique(i), 5)) %>%
+  gather(variable, value, -i, -t, -t_max) %>%
+  ggplot(aes(t, value)) +
+  geom_line() +
+  facet_grid(i ~ variable, scales = "free_y")
+
+d10_plot[[2]] <- d10_data %>%
+  group_by(i) %>%
+  filter(t == max(t)) %>%
+  ungroup() %>%
+  gather(variable, value, -i, -t, -t_max) %>%
+  group_by(t, variable) %>%
+  summarize(value = mean(value), .groups = "drop") %>%
+  ggplot(aes(t, value)) +
+  geom_line() +
+  facet_wrap(~ variable, scales = "free_y", ncol = 2)
+
+ggarrange(
+  d10_plot[[1]],
+  d10_plot[[2]],
+  ncol = 1,
+  nrow = 2
+)
+
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
+data.frame(from = "X", to = "Y") %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.5, yend = 0.975)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.15) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+## ----echo=FALSE, fig.height=3.5, fig.width=7----------------------------------
+data.frame(from = "X(t)", to = "Y(t)") %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y(t)", xend = 0.975, yend = 0.975)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X(t+1)", xend = 1, yend = 0.035)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y(t+1)", xend = 1, yend = 0)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+
+## -----------------------------------------------------------------------------
+d11 <- data.frame(from = "X", to = "Y")
+
+d11_functions <- function_from_edge(d11)
+
+function_X <- function(n){
+  X <- rnorm(n, mean = 0, sd = 1)
+  return(X)
+}
+
+function_Y <- function(X){
+  Y <- 0.5 * X + rnorm(length(X), mean = 0, sd = 0.00001)
+  return(Y)
+}
+
+d11_functions <- define(d11_functions, which = "X", what = function_X)
+d11_functions <- define(d11_functions, which = "Y", what = function_Y)
+
+d11_data <- data_from_function(d11_functions, n = 10000)
+
+## -----------------------------------------------------------------------------
+d11 <- add_row(d11, data.frame(from = "Y", to = "X"))
+
+function_X <- function(Y){
+  X <- 2 * Y + rnorm(length(Y), mean = 0, sd = 0.00001)
+  return(X)
+}
+
+d11_functions <- define(d11_functions, which = "X", what = function_X)
+
+set.seed(1)
+d11_T_max <- rpois(nrow(d11_data), lambda = 25)
+d11_data <- time_varying(d11_functions, data = d11_data, T_max = d11_T_max)
+
+## ----echo=FALSE, fig.height=7, fig.width=7------------------------------------
+d11_plot <- list()
+
+set.seed(1); d11_plot[[1]] <- d11_data %>%
+  filter(i %in% sample(unique(i), 5)) %>%
+  gather(variable, value, -i, -t, -t_max) %>%
+  group_by(i, variable) %>%
+  mutate(z_value = scale(value)) %>%
+  ggplot(aes(t, z_value)) +
+  geom_line() +
+  facet_grid(i ~ variable, scales = "free_y")
+
+d11_plot[[2]] <- d11_data %>%
+  group_by(i) %>%
+  filter(t == max(t)) %>%
+  ungroup() %>%
+  gather(variable, value, -i, -t, -t_max) %>%
+  group_by(t, variable) %>%
+  summarize(value = mean(value), .groups = "drop") %>%
+  ggplot(aes(t, value)) +
+  geom_line() +
+  facet_wrap(~ variable, scales = "free_y", ncol = 2)
+
+ggarrange(
+  d11_plot[[1]],
+  d11_plot[[2]],
+  ncol = 1,
+  nrow = 2
+)
+

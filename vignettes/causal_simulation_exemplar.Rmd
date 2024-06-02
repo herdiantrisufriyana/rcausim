@@ -1416,3 +1416,227 @@ ggarrange(
 ```
 
 We observe that higher proportions of missing values shift the estimated coefficients away from the true values. A missing proportion \(p\) of approximately 0.50 or more results in a substantially incorrect estimate for the effect of \(X\) on \(Y\), although the results remain statistically significant in cases of MCAR without missing value imputation.
+
+## Time-Varying Causation
+
+The value of a variable at time \(t\) may determine that of the same variable at time \(t+1\). This variable may be a cause (or an exposure/intervention), an effect (or an outcome/competing risk), or a covariate (or a mediator/confounder/collider). A cause-effect relationship that involves such properties is called time-varying causation. The figure below demonstrates both time-varying exposure and outcome. Since a standard causal graph should be a directed acyclic graph (DAG), we represent the same variable at different times as multiple vertices.
+
+```{r echo=FALSE, fig.height=3.5, fig.width=7}
+data.frame(from = "X(t)", to = "Y(t)") %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X(t)", xend = 0.975, yend = 1)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y(t)", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X(t+1)", xend = 1, yend = 0.035)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y(t+1)", xend = 1, yend = 0)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+```
+
+To simulate time-varying causation, first, we need to generate data at the initial time \(t=0\). However, time-varying causation must be represented as a directed cyclic graph (DCG), in which loops are allowed. Nevertheless, when generating data at the first step, any loops must be avoided. Hence, any edge from and to the same vertex is not included yet.
+
+```{r}
+d10 <- data.frame(from = "X", to = "Y")
+
+d10_functions <- function_from_edge(d10)
+
+function_X <- function(n){
+  X <- rnorm(n, mean = 0, sd = 1)
+  X <- abs(X)
+  return(X)
+}
+
+function_Y <- function(X){
+  Y <- 0.5 * X + rnorm(length(X), mean = 0.1, sd = 0.005)
+  return(Y)
+}
+
+d10_functions <- define(d10_functions, which = "X", what = function_X)
+d10_functions <- define(d10_functions, which = "Y", what = function_Y)
+
+d10_data <- data_from_function(d10_functions, n = 10000)
+```
+
+We must note that `rcausim` uses looping to simulate time-varying causation without differentiating the names of a variable at different times. For example, the same name \(X\) is used for a variable \(X\) at time \(t\) and \(t+1\); hence, the causal graph will look like the figure below in the context of `rcausim`. In this example, we use time-varying outcome, where the value of \(Y\) at time \(t\) also determines the value of the same variable at time \(t+1\) in addition to the values of variable \(X\).
+
+```{r echo=FALSE, fig.height=3.5, fig.width=7}
+set.seed(1)
+data.frame(from = "X", to = "Y") %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 1, name = "X", xend = 0.975, yend = 0.025)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.975, yend = 0)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y", xend = 1, yend = 0)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+```
+
+Therefore, before generating the data for \(t>0\), we need to add edges from and to the same variables. The function is also modified to include the variable itself as one of the arguments. The class of `Functions` should be redefined with the modified function.
+
+Since this step assumes we already generated the data at \(t=0\), we need to use the output from the previous step, i.e., `d10_data`, as the input in this step.
+
+In simulating time-varying causation, we also need to determine a maximum time \(t_{max}\) for each instance to be simulated. The `T_max` argument facilitates this feature.
+
+```{r}
+d10 <- add_row(d10, data.frame(from = "Y", to = "Y"))
+
+function_Y <- function(X, Y){
+  Y <- 0.5 * X + 1.1 * Y
+  return(Y)
+}
+
+d10_functions <- define(d10_functions, which = "Y", what = function_Y)
+
+set.seed(1)
+d10_T_max <- rpois(nrow(d10_data), lambda = 25)
+d10_data <- time_varying(d10_functions, data = d10_data, T_max = d10_T_max)
+```
+
+```{r echo=FALSE, fig.height=7, fig.width=7}
+d10_plot <- list()
+
+set.seed(1); d10_plot[[1]] <- d10_data %>%
+  filter(i %in% sample(unique(i), 5)) %>%
+  gather(variable, value, -i, -t, -t_max) %>%
+  ggplot(aes(t, value)) +
+  geom_line() +
+  facet_grid(i ~ variable, scales = "free_y")
+
+d10_plot[[2]] <- d10_data %>%
+  group_by(i) %>%
+  filter(t == max(t)) %>%
+  ungroup() %>%
+  gather(variable, value, -i, -t, -t_max) %>%
+  group_by(t, variable) %>%
+  summarize(value = mean(value), .groups = "drop") %>%
+  ggplot(aes(t, value)) +
+  geom_line() +
+  facet_wrap(~ variable, scales = "free_y", ncol = 2)
+
+ggarrange(
+  d10_plot[[1]],
+  d10_plot[[2]],
+  ncol = 1,
+  nrow = 2
+)
+```
+
+The figure above shows the values of \(X\) and \(Y\) at different times for randomly-sampled instances (top) and their time-wise values summarized from all instances (bottom). We can observe the values of \(Y\) changing over time for each instance, while the values of \(X\) do not. The summary values of \(X\) vary at different times due to inter-instance variability each time.
+
+## Bidirectional Causation
+
+Two variables may affect each other simultaneously or in a feedback loop. For example, the value of \(Y\) depends on the value of \(X\), and concurrently, the value of \(X\) also depends on the value of \(Y\). This inter-dependency is known as bidirectional causation.
+
+```{r echo=FALSE, fig.height=3.5, fig.width=7}
+data.frame(from = "X", to = "Y") %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y", xend = 0.5, yend = 0.975)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.15) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+```
+
+In practical scenarios, however, even if two variables affect each other, we model their relationship at discrete time steps. Therefore, we can depict bidirectional causation in a standard causal graph which uses a DAG, representing the variables at different times \(t\) and \(t+1\), as shown below.
+
+```{r echo=FALSE, fig.height=3.5, fig.width=7}
+data.frame(from = "X(t)", to = "Y(t)") %>%
+  graph_from_data_frame() %>%
+  ggnetwork(layout = layout_as_tree(.)) %>%
+  add_row(data.frame(x = 0.5, y = 0, name = "Y(t)", xend = 0.975, yend = 0.975)) %>%
+  add_row(data.frame(x = 1, y = 1, name = "X(t+1)", xend = 1, yend = 0.035)) %>%
+  add_row(data.frame(x = 1, y = 0, name = "Y(t+1)", xend = 1, yend = 0)) %>%
+  ggplot(aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(type = "closed"), curvature = 0.05) +
+  geom_nodelabel(aes(label = name)) +
+  coord_flip() +
+  scale_y_reverse() +
+  theme_void()
+```
+
+To simulate bidirectional causation using the `time_varying` function in `rcausim`, we first generate data at \(t=0\). This initial step requires a DAG, avoiding any loops.
+
+```{r}
+d11 <- data.frame(from = "X", to = "Y")
+
+d11_functions <- function_from_edge(d11)
+
+function_X <- function(n){
+  X <- rnorm(n, mean = 0, sd = 1)
+  return(X)
+}
+
+function_Y <- function(X){
+  Y <- 0.5 * X + rnorm(length(X), mean = 0, sd = 0.00001)
+  return(Y)
+}
+
+d11_functions <- define(d11_functions, which = "X", what = function_X)
+d11_functions <- define(d11_functions, which = "Y", what = function_Y)
+
+d11_data <- data_from_function(d11_functions, n = 10000)
+```
+
+After generating initial data, subsequent time points involve adding reciprocal edges to model the ongoing interaction between \(X\) and \(Y\). In this example, we add an edge from the parent vertex of \(X\)'s vertex, which represents \(Y\). As described in the previous section, we need to provide the initial data `d11_data` and the maximum times `d11_T_max`.
+
+```{r}
+d11 <- add_row(d11, data.frame(from = "Y", to = "X"))
+
+function_X <- function(Y){
+  X <- 2 * Y + rnorm(length(Y), mean = 0, sd = 0.00001)
+  return(X)
+}
+
+d11_functions <- define(d11_functions, which = "X", what = function_X)
+
+set.seed(1)
+d11_T_max <- rpois(nrow(d11_data), lambda = 25)
+d11_data <- time_varying(d11_functions, data = d11_data, T_max = d11_T_max)
+```
+
+```{r echo=FALSE, fig.height=7, fig.width=7}
+d11_plot <- list()
+
+set.seed(1); d11_plot[[1]] <- d11_data %>%
+  filter(i %in% sample(unique(i), 5)) %>%
+  gather(variable, value, -i, -t, -t_max) %>%
+  group_by(i, variable) %>%
+  mutate(z_value = scale(value)) %>%
+  ggplot(aes(t, z_value)) +
+  geom_line() +
+  facet_grid(i ~ variable, scales = "free_y")
+
+d11_plot[[2]] <- d11_data %>%
+  group_by(i) %>%
+  filter(t == max(t)) %>%
+  ungroup() %>%
+  gather(variable, value, -i, -t, -t_max) %>%
+  group_by(t, variable) %>%
+  summarize(value = mean(value), .groups = "drop") %>%
+  ggplot(aes(t, value)) +
+  geom_line() +
+  facet_wrap(~ variable, scales = "free_y", ncol = 2)
+
+ggarrange(
+  d11_plot[[1]],
+  d11_plot[[2]],
+  ncol = 1,
+  nrow = 2
+)
+```
+
+The figure above demonstrates the values of \(X\) and \(Y\) over time for randomly-sampled instances (top) and summarizes their time-wise values across all instances (bottom). As time-varying causation, both variables exhibit changes over time, reflecting the bidirectional causation they exert on each other.
+
+
+

@@ -1,8 +1,28 @@
 ---
 title: "Quick Start"
-author: "Herdiantri Sufriyana"
+author:
+  - name: Herdiantri Sufriyana
+    affiliation:
+    - &gibi Graduate Institute of Biomedical Informatics, College of Medical
+      Science and Technology, Taipei Medical University, Taipei, Taiwan. 
+    - Department of Medical Physiology, Faculty of Medicine, Universitas
+      Nahdlatul Ulama Surabaya, Surabaya, Indonesia. 
+    email: herdi@tmu.edu.tw
+  - name: Emily Chia-Yu Su
+    affiliation:
+    - *gibi
+    - Clinical Big Data Research Center, Taipei Medical University
+      Hospital, Taipei, Taiwan. 
+    - Research Center for Artificial Intelligence in Medicine, Taipei Medical
+      University, Taipei, Taiwan. 
 date: "2024-05-11"
-output: rmarkdown::html_vignette
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
 vignette: >
   %\VignetteIndexEntry{Quick Start}
   %\VignetteEngine{knitr::rmarkdown}
@@ -11,7 +31,7 @@ vignette: >
 
 # Define Functions and Edges
 
-## Defining Causal Structure
+## Start by Defining Causal Structure
 
 Start by defining the causal structure as a data frame of edges:
 
@@ -52,7 +72,7 @@ functions <- define(functions, 'B', function_B)
 print(functions)
 ```
 
-## Alternatively, Start by Defining Functions
+## Start by Defining Functions
 
 You can also start by defining functions directly:
 

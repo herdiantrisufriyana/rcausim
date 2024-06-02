@@ -1,8 +1,28 @@
 ---
 title: "Causal Simulation Exemplar"
-author: "Herdiantri Sufriyana"
+author:
+  - name: Herdiantri Sufriyana
+    affiliation:
+    - &gibi Graduate Institute of Biomedical Informatics, College of Medical
+      Science and Technology, Taipei Medical University, Taipei, Taiwan. 
+    - Department of Medical Physiology, Faculty of Medicine, Universitas
+      Nahdlatul Ulama Surabaya, Surabaya, Indonesia. 
+    email: herdi@tmu.edu.tw
+  - name: Emily Chia-Yu Su
+    affiliation:
+    - *gibi
+    - Clinical Big Data Research Center, Taipei Medical University
+      Hospital, Taipei, Taiwan. 
+    - Research Center for Artificial Intelligence in Medicine, Taipei Medical
+      University, Taipei, Taiwan. 
 date: "2024-05-18"
-output: rmarkdown::html_vignette
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
 vignette: >
   %\VignetteIndexEntry{Causal Simulation Exemplar}
   %\VignetteEngine{knitr::rmarkdown}
@@ -169,7 +189,7 @@ library(rcausim)
 library(broom)
 ```
 
-## Both causal and mediator paths allow both correlation and causation
+## Causal and mediator paths allow both
 
 We start by defining a `Functions` class based on the specified causal structure in our previous data frame `d`. This class will help specify the required arguments for each variable's function.
 
@@ -319,7 +339,7 @@ path2_results %>%
 
 In our data generation process, \(M\) is defined as \(0.7 \times X + 0.3\), and \(Y\) as \(0.5 \times M + 0.1\); therefore, \(Y(X)\) equals \(0.5 \times (0.7 \times X + 0.3) + 0.1\). Solving this equation, we find that the estimated coefficients reflect the data generation process.
 
-## The confounder path allows correlation although there is no causation
+## Confounder path allows correlation
 
 In the third path, both \(X\) and \(Y\) are influenced by \(C\), as shown in `d3` below.
 
@@ -406,7 +426,7 @@ path3_results %>%
 
 Results indicate a statistically significant correlation between \(X\) and \(Y\), although there is no edge directly from \(X\) to \(Y\). Notably, the coefficients are not identical to those used in the data generation process.
 
-## The collider path allows neither correlation nor causation
+## Collider path allows none
 
 In this path, both \(X\) and \(Y\) both influence \(K\) but do not influence each other. This scenario is illustrated by `d4`.
 
@@ -564,7 +584,7 @@ d234_g_plots <-
   lapply(\(x) x + theme_void())
 ```
 
-## The mediator path without and with a causal path
+## Mediator without/with causal path
 
 Below we outline the data generation process in which the null hypothesis (left) and the alternative hypothesis (right) are accepted.
 
@@ -636,7 +656,7 @@ rbind(
 
 The regression results show that the coefficient of \(X\) is reduced from approximately 0.35 to nearly 0 when we condition on \(Z\) (which includes the mediator \(M\)) in the first version. When conditioning the second version on \(Z\), the coefficient of \(X\) is also reduced, from about 0.60 to 0.26; however, the effect of \(X\) on \(Y\) remains significant. This indicates that in the first scenario, conditioning on \(M\) successfully blocks the path from \(X\) to \(Y\), supporting the hypothesis of \(M\) being a complete mediator. In contrast, in the second scenario, \(M\) does not completely mediate the relationship between \(X\) and \(Y\), as \(X\) still has a direct effect on \(Y\).
 
-## The confounder path without and with a causal path
+## Confounder without/with causal path
 
 We now apply the data generation process similarly, but in this instance, \(Z\) includes \(C\), as illustrated below.
 
@@ -708,7 +728,7 @@ rbind(
 
 For the first version, the coefficient of \(X\) is significantly reduced from approximately 0.7 to nearly 0 when we condition on \(Z\) (which includes the confounder \(C\)). In the second version, the coefficient is reduced from 0.96 to 0.24; however, \(X\) still exerts a significant effect on \(Y\).
 
-## The collider path without and with a causal path
+## Collider without/with causal path
 
 Unlike the mediator and confounder paths, the collider path exhibits an opposite result when we condition the effect of \(X\) on \(Y\).
 

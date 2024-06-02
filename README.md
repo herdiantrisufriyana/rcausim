@@ -113,7 +113,7 @@ Explore detailed examples and methodologies in the following vignettes:
 
 - [**Real-World Causal Structure**](https://htmlpreview.github.io/?https://github.com/herdiantrisufriyana/rcausim/blob/master/doc/real_world_causal_structure.html): Demonstrates the application of `rcausim` to simulate data based on complex, real-world causal structures.
 
-- [**Reference Manual**](https://github.com/herdiantrisufriyana/rcausim/blob/master/extras/rcausim_0.0.0.9000.pdf): Comprehensive documentation of all functions and features available in `rcausim`. Ideal for detailed reference and advanced use cases.
+- [**Reference Manual**](https://github.com/herdiantrisufriyana/rcausim/blob/master/extras/rcausim_0.0.1.pdf): Comprehensive documentation of all functions and features available in `rcausim`. Ideal for detailed reference and advanced use cases.
 
 
 ## License

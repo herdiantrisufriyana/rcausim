@@ -15,7 +15,7 @@ A list with 5 elements:
 }
 }
 \source{
-This package
+Generated for examples in this package.
 }
 \usage{
 functions

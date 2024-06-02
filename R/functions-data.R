@@ -16,6 +16,7 @@
 #'   \item{E}{A function with arguments 'A' and 'C'.}
 #' }
 #'
-#' @source This package
+#' @source Generated for examples in this package.
 #' @keywords dataset
+#' @name functions
 'functions'

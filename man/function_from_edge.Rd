@@ -12,7 +12,7 @@ and 'to in this order. A vertex name 'n' is not allowed.}
 }
 \value{
 A list of character vectors of arguments for function which will be
-defined by a user using \code{define} function.
+defined by a user using \code{\link{define}} function.
 }
 \description{
 List functions given edges

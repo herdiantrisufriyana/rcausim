@@ -8,17 +8,17 @@
 A data frame with 7 rows and 2 columns:
 \describe{
 \item{from}{A vertex name from which a directed edge comes.}
-\item{tp}{A vertex name to which a directed edge comes.}
+\item{to}{A vertex name to which a directed edge comes.}
 }
 }
 \source{
-This package
+Generated for examples in this package.
 }
 \usage{
 edges
 }
 \description{
-An example of a data frame which include the columns 'from' and 'to in this
+An example of a data frame which include the columns 'from' and 'to' in this
 order. A vertex name 'n' does not exist.
 }
 \keyword{dataset}

@@ -5,7 +5,7 @@
 #' of the list must be functions.
 #'
 #' @return A list of functions. It can be an input for generating the simulated
-#' data, or redefined by a user using \code{define} function.
+#' data, or redefined by a user using \code{\link{define}} function.
 #'
 #' @keywords function
 #'
@@ -42,8 +42,10 @@ function_from_user=function(func){
   # Check if all elements of 'func' are named.
   func_names=
     func %>%
-    names() %>%
-    .[.!='']
+    names()
+
+  func_names=
+    func_names[func_names!='']
 
   if(length(func_names)!=length(func)){
     stop(

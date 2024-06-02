@@ -21,24 +21,22 @@ Description: Generate causally-simulated data to serve as ground truth for evalu
 Depends: R (>= 4.4.0)
 Imports:
     dplyr,
-    ggplot2,
     magrittr,
     purrr,
-    readr,
-    stringr,
-    tibble,
-    tidyr
+    tidyr,
+    igraph
 Suggests: 
     broom,
     ggnetwork,
     ggpubr,
-    igraph,
     kableExtra,
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    tidyverse
 VignetteBuilder: knitr
-License: GPL-3
+License: file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
+LazyData: true

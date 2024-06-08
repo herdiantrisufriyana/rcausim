@@ -109,7 +109,7 @@ Explore detailed examples and methodologies in the following vignettes:
 
 - [**Causal Simulation Exemplar**](https://htmlpreview.github.io/?https://github.com/herdiantrisufriyana/rcausim/blob/master/doc/causal_simulation_exemplar.html): A guide through basic causal simulation scenarios demonstrating how to use `rcausim` to set up and simulate data.
 
-- [**Reference Manual**](https://github.com/herdiantrisufriyana/rcausim/blob/master/extras/rcausim_0.0.1.pdf): Comprehensive documentation of all functions and features available in `rcausim`. Ideal for detailed reference and advanced use cases.
+- [**Reference Manual**](https://github.com/herdiantrisufriyana/rcausim/blob/master/extras/rcausim_0.0.2.pdf): Comprehensive documentation of all functions and features available in `rcausim`. Ideal for detailed reference and advanced use cases.
 
 
 ## License

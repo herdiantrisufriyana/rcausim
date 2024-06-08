@@ -2,7 +2,7 @@
 #'
 #' @param func Functions, a list of functions which are defined by a user. The
 #' list must be non-empty. All elements of the list must be named. All elements
-#' of the list must be functions.
+#' of the list must be functions. The list must construct 1 edge or more.
 #'
 #' @return A list of functions. It can be an input for generating the simulated
 #' data, or redefined by a user using \code{\link{define}} function.
@@ -62,6 +62,26 @@ function_from_user=function(func){
       '\n'
       ,'All elements of the list must be functions. Please ensure that each\n'
       ,'element in the list is a valid function object.'
+    )
+  }
+
+  # List arguments in each function
+  arg=
+    func %>%
+    lapply(formals) %>%
+    lapply(names)
+
+  # Filter arguments of functions from non-terminal vertices
+  v_nonterm_arg=
+    arg[sapply(arg,\(x)length(x[x!='n'])>0)]
+
+  #  Check if at least one edge exists
+  if(length(v_nonterm_arg)==0){
+    stop(
+      paste0(
+        '\n'
+        ,'The argument \'func\' must construct 1 edge or more.'
+      )
     )
   }
 

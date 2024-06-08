@@ -6,7 +6,8 @@
 #' @param which Which, a character of length 1 indicating a vertex name for
 #' which function is defined. The vertex name must be defined in 'Functions'.
 #' @param what What, a function to be defined. It must use all and only
-#' the specified arguments for the vertex in 'Functions'.
+#' the specified arguments for the vertex in 'Functions', if not previously
+#' defined.
 #'
 #' @return A list of either functions or character vectors of arguments for
 #' function. It can be continuously defined or redefined by a user using
@@ -77,18 +78,24 @@ define=function(func,which,what){
   }
 
   # Check if arguments in 'what' function match the specified arguments
-  arg=
-    what %>%
-    formals() %>%
-    names()
-
   if(!is.function(func[[which]])){
-    if(!all(func[[which]]%in%arg)){
+    arg=
+      what %>%
+      formals() %>%
+      names() %>%
+      unique()
+
+    arg_in_which_func=
+      func[[which]] %>%
+      unique()
+
+    if(!all(c(arg%in%arg_in_which_func,arg_in_which_func%in%arg))){
       stop(
         paste0(
           '\n'
-          ,'Your function must use all and only these specified arguments:\n'
-          ,func[[which]] %>%
+          ,'If not previously defined, your function must use all and only '
+          ,'these specified arguments:\n'
+          ,arg_in_which_func %>%
             paste0(collapse=', ')
         )
       )

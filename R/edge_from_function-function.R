@@ -31,10 +31,35 @@ edge_from_function=function(func){
   }
 
   # List arguments in each function
-  arg=
+  arg=c()
+
+  func_is_function=
     func %>%
-    lapply(formals) %>%
-    lapply(names)
+    sapply(\(x)inherits(x,"function"))
+
+  if(sum(func_is_function)>0){
+    arg_in_function=
+      func[func_is_function] %>%
+      lapply(formals) %>%
+      lapply(names)
+
+    arg=
+      arg %>%
+      c(arg_in_function)
+  }
+
+  func_is_character=
+    func %>%
+    sapply(\(x)inherits(x,"character"))
+
+  if(sum(func_is_character)>0){
+    arg_in_character=
+      func[func_is_character]
+
+    arg=
+      arg %>%
+      c(arg_in_character)
+  }
 
   # Filter arguments of functions from non-terminal vertices
   v_nonterm_arg=

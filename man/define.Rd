@@ -15,7 +15,8 @@ functions.}
 which function is defined. The vertex name must be defined in 'Functions'.}
 
 \item{what}{What, a function to be defined. It must use all and only
-the specified arguments for the vertex in 'Functions'.}
+the specified arguments for the vertex in 'Functions', if not previously
+defined.}
 }
 \value{
 A list of either functions or character vectors of arguments for

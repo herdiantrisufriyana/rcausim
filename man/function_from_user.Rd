@@ -9,7 +9,7 @@ function_from_user(func)
 \arguments{
 \item{func}{Functions, a list of functions which are defined by a user. The
 list must be non-empty. All elements of the list must be named. All elements
-of the list must be functions.}
+of the list must be functions. The list must construct 1 edge or more.}
 }
 \value{
 A list of functions. It can be an input for generating the simulated

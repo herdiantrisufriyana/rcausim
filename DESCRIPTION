@@ -1,6 +1,6 @@
 Package: rcausim
 Title: Generate Causally-Simulated Data
-Version: 0.0.1
+Version: 0.0.2
 Authors@R:
   c(person(
       given = "Herdiantri"
@@ -32,7 +32,7 @@ Suggests:
     kableExtra,
     knitr,
     rmarkdown,
-    testthat,
+    testthat (>= 3.0.0),
     tidyverse
 VignetteBuilder: knitr
 License: file LICENSE
@@ -40,3 +40,4 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 LazyData: true
+Config/testthat/edition: 3

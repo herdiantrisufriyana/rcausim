@@ -34,4 +34,4 @@ functions <- function_from_edge(edges)
 function_B <- function(n){ rnorm(n, 90, 5) }
 functions <- define(functions, 'B', function_B)
 }
-\keyword{function}
+\keyword{edge-specified-function-definition}

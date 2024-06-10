@@ -7,7 +7,7 @@
 #' @return A list of functions. It can be an input for generating the simulated
 #' data, or redefined by a user using \code{\link{define}} function.
 #'
-#' @keywords function-listing, user-specified
+#' @keywords user-specified-function-definition
 #'
 #' @export
 #'

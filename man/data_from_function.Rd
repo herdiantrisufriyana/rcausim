@@ -33,6 +33,4 @@ Generate causally-simulated data
 data(functions)
 data_from_function(functions, n = 100)
 }
-\keyword{data-generation,}
-\keyword{function-specified,}
-\keyword{time-fixed}
+\keyword{time-fixed-data-generation}

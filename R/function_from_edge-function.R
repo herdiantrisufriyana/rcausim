@@ -6,7 +6,7 @@
 #' @return A list of character vectors of arguments for function which will be
 #' defined by a user using \code{\link{define}} function.
 #'
-#' @keywords function-listing, edge-specified
+#' @keywords edge-specified-function-listing
 #'
 #' @export
 #'

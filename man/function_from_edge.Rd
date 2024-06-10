@@ -22,5 +22,4 @@ List functions given edges
 data(edges)
 function_from_edge(edges)
 }
-\keyword{edge-specified}
-\keyword{function-listing,}
+\keyword{edge-specified-function-listing}

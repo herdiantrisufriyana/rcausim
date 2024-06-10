@@ -25,5 +25,4 @@ function_A <- function(B){ ifelse(B>=95, 1, 0) }
 functions <- list(A = function_A, B = function_B)
 functions <- function_from_user(functions)
 }
-\keyword{function-listing,}
-\keyword{user-specified}
+\keyword{user-specified-function-definition}

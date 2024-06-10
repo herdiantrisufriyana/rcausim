@@ -14,7 +14,7 @@
 #' \code{define} function. If all elements of the list are functions, then it
 #' can be an input for generating the simulated data.
 #'
-#' @keywords function
+#' @keywords edge-specified-function-definition
 #'
 #' @export
 #'

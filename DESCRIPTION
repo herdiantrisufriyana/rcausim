@@ -18,7 +18,7 @@ Authors@R:
     )
   )
 Description: Generate causally-simulated data to serve as ground truth for evaluating methods in causal discovery and effect estimation. The package provides tools to assist in defining functions based on specified edges, and conversely, defining edges based on functions. It enables the generation of data according to these predefined functions and causal structures. This is particularly useful for researchers in fields such as artificial intelligence, statistics, biology, medicine, epidemiology, economics, and social sciences, who are developing a general or a domain-specific methods to discover causal structures and estimate causal effects. Data simulation adheres to principles of structural causal modeling.
-Depends: R (>= 4.4.0)
+Depends: R (>= 4.2.3)
 Imports:
     dplyr,
     magrittr,

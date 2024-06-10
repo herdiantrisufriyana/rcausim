@@ -6,7 +6,7 @@
 #'
 #' @return A data frame which include the columns 'from' and 'to in this order.
 #'
-#' @keywords edge, function
+#' @keywords edge-listing, function-specified
 #'
 #' @export
 #'

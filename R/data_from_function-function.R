@@ -16,7 +16,7 @@
 #' @return A data frame which include the simulated data for each vertex as a
 #' column.
 #'
-#' @keywords data, edge, function
+#' @keywords data-generation, function-specified, time-fixed
 #'
 #' @export
 #'

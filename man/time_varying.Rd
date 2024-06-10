@@ -47,5 +47,6 @@ T_max <- rpois(nrow(simulated_data), lambda = 25)
 
 time_varying(functions, data = simulated_data, T_max = T_max)
 }
-\keyword{data,}
+\keyword{data-generation,}
+\keyword{function-specified,}
 \keyword{time-varying}

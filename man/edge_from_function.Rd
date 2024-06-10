@@ -22,5 +22,5 @@ Identify edges given functions
 data(functions)
 edge_from_function(functions)
 }
-\keyword{edge,}
-\keyword{function}
+\keyword{edge-listing,}
+\keyword{function-specified}

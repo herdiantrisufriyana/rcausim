@@ -20,7 +20,7 @@
 #' @return A data frame which include the simulated data for each vertex as a
 #' column for each time up to maximum time for every instance.
 #'
-#' @keywords data, time-varying
+#' @keywords data-generation, function-specified, time-varying
 #'
 #' @export
 #'
